@@ -1,0 +1,135 @@
+==============================================
+BANKSPHERE - GIT COMMANDS TO PUSH TO GITHUB
+==============================================
+
+STEP 1: INITIALIZE GIT (if not already done)
+---------------------------------------------
+cd banksphere-main
+git init
+
+
+STEP 2: ADD ALL FILES
+---------------------------------------------
+git add .
+
+
+STEP 3: COMMIT FILES
+---------------------------------------------
+git commit -m "Initial commit - BankSphere Banking System with Crypto Trading, AI Chatbot, and Fraud Detection"
+
+
+STEP 4: CREATE GITHUB REPOSITORY
+---------------------------------------------
+1. Go to https://github.com
+2. Click "+" button (top right) → "New repository"
+3. Repository name: banksphere
+4. Description: Complete Banking Management System - DBMS Project
+5. Choose Public or Private
+6. DO NOT check "Initialize with README"
+7. Click "Create repository"
+
+
+STEP 5: ADD REMOTE AND PUSH
+---------------------------------------------
+Replace YOUR_USERNAME with your actual GitHub username:
+
+git remote add origin https://github.com/YOUR_USERNAME/banksphere.git
+git branch -M main
+git push -u origin main
+
+
+ALTERNATIVE: If you already have a repository
+---------------------------------------------
+git remote set-url origin https://github.com/YOUR_USERNAME/banksphere.git
+git push -u origin main
+
+
+STEP 6: VERIFY ON GITHUB
+---------------------------------------------
+Go to: https://github.com/YOUR_USERNAME/banksphere
+You should see all your files!
+
+
+==============================================
+FUTURE UPDATES - PUSH CHANGES
+==============================================
+
+After making changes to your code:
+
+git add .
+git commit -m "Description of changes"
+git push
+
+
+==============================================
+USEFUL GIT COMMANDS
+==============================================
+
+# Check status
+git status
+
+# View commit history
+git log
+
+# View remote URL
+git remote -v
+
+# Create new branch
+git checkout -b feature-name
+
+# Switch branch
+git checkout main
+
+# Pull latest changes
+git pull origin main
+
+# Undo last commit (keep changes)
+git reset --soft HEAD~1
+
+# Undo last commit (discard changes)
+git reset --hard HEAD~1
+
+
+==============================================
+TROUBLESHOOTING
+==============================================
+
+ERROR: "fatal: remote origin already exists"
+SOLUTION: git remote remove origin
+          Then add again: git remote add origin <url>
+
+ERROR: "Permission denied (publickey)"
+SOLUTION: Use HTTPS instead of SSH
+          Or set up SSH keys: https://docs.github.com/en/authentication
+
+ERROR: "Updates were rejected"
+SOLUTION: git pull origin main --rebase
+          Then: git push origin main
+
+ERROR: "Large files"
+SOLUTION: Add to .gitignore
+          Or use Git LFS for large files
+
+
+==============================================
+NEXT STEPS AFTER GITHUB PUSH
+==============================================
+
+1. ✅ Code is on GitHub
+2. 🚀 Deploy to Render (see DEPLOYMENT_GUIDE.md)
+3. ⚡ Or deploy to Vercel (see DEPLOYMENT_GUIDE.md)
+4. 🗄️ Set up database
+5. 🌐 Configure environment variables
+6. 🎉 Your app is live!
+
+
+==============================================
+QUICK DEPLOYMENT LINKS
+==============================================
+
+Render: https://dashboard.render.com/
+Vercel: https://vercel.com/dashboard
+Railway: https://railway.app/
+Heroku: https://dashboard.heroku.com/
+
+==============================================

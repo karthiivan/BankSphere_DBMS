@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BankSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .admin-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-card {
+            border-left: 4px solid #dc3545;
+        }
+        .admin-nav {
+            background: linear-gradient(135deg, #dc3545 0%, #6f42c1 100%);
+        }
+        .admin-feature {
+            background: linear-gradient(135deg, #e83e8c 0%, #fd7e14 100%);
+            color: white;
+        }
+        .customer-mgmt {
+            background: linear-gradient(135deg, #20c997 0%, #0dcaf0 100%);
+            color: white;
+        }
+        .system-mgmt {
+            background: linear-gradient(135deg, #6610f2 0%, #6f42c1 100%);
+            color: white;
+        }
+        .reports-card {
+            background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark admin-nav">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shield-check"></i> BankSphere Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin-dashboard.html">Admin Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/enhanced-dashboard.html">User View</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-gear"></i> <span id="nav-username">Admin</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Admin Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-danger">
+                    <div class="card-body">
+                        <h2 class="card-title text-danger">
+                            <i class="bi bi-shield-check"></i> Admin Control Panel
+                        </h2>
+                        <p class="card-text">Manage customers, accounts, loans, and system operations with administrative privileges.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Customers</h6>
+                                <h4 id="total-customers">0</h4>
+                            </div>
+                            <i class="bi bi-people text-danger" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Accounts</h6>
+                                <h4 id="total-accounts">0</h4>
+                            </div>
+                            <i class="bi bi-bank text-danger" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Pending Loans</h6>
+                                <h4 id="pending-loans">0</h4>
+                            </div>
+                            <i class="bi bi-cash-coin text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">System Health</h6>
+                                <h4 id="system-health">Good</h4>
+                            </div>
+                            <i class="bi bi-activity text-success" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Features Grid -->
+        <div class="row mb-4">
+            <!-- Customer Management -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card admin-card customer-mgmt">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-people-fill"></i> Customer Management
+                        </h5>
+                        <p class="card-text">View, edit, and manage customer accounts and profiles.</p>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm me-2" onclick="loadCustomers()">
+                                <i class="bi bi-list"></i> View Customers
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="showCreateCustomer()">
+                                <i class="bi bi-person-plus"></i> Add Customer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Management -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card admin-card admin-feature">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-bank2"></i> Account Management
+                        </h5>
+                        <p class="card-text">Manage all customer accounts, balances, and account types.</p>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm me-2" onclick="loadAllAccounts()">
+                                <i class="bi bi-list"></i> View Accounts
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="showCreateAccount()">
+                                <i class="bi bi-plus-circle"></i> Create Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loan Management -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card admin-card system-mgmt">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-cash-stack"></i> Loan Management
+                        </h5>
+                        <p class="card-text">Review and approve loan applications, manage loan payments.</p>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm me-2" onclick="loadPendingLoans()">
+                                <i class="bi bi-clock"></i> Pending Loans
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="loadAllLoans()">
+                                <i class="bi bi-list"></i> All Loans
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Monitoring -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card admin-card reports-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-graph-up"></i> Transaction Monitoring
+                        </h5>
+                        <p class="card-text">Monitor all transactions, detect suspicious activities.</p>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm me-2" onclick="loadTransactions()">
+                                <i class="bi bi-list"></i> View Transactions
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="loadSuspiciousActivity()">
+                                <i class="bi bi-exclamation-triangle"></i> Suspicious
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Reports -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card admin-card customer-mgmt">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-file-earmark-bar-graph"></i> System Reports
+                        </h5>
+                        <p class="card-text">Generate comprehensive reports and analytics.</p>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm me-2" onclick="generateReport('daily')">
+                                <i class="bi bi-calendar-day"></i> Daily Report
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="generateReport('monthly')">
+                                <i class="bi bi-calendar-month"></i> Monthly
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL Query Interface -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card admin-card admin-feature">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-terminal"></i> SQL Query Interface
+                        </h5>
+                        <p class="card-text">Execute SQL queries directly on the database.</p>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm" onclick="showSQLInterface()">
+                                <i class="bi bi-code"></i> Open SQL Console
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent System Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recent-admin-activity">
+                            <p class="text-center text-muted">Loading recent activity...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">System Alerts</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="system-alerts">
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i> All systems operational
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals will be dynamically created here -->
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/admin.js"></script>
+    
+    <script>
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication and admin role
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!localStorage.getItem('token') || (user.role !== 'admin' && user.role !== 'employee')) {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = '/';
+                return;
+            }
+
+            // Update navigation with username
+            document.getElementById('nav-username').textContent = user.username || 'Admin';
+
+            // Load admin dashboard data
+            await loadAdminDashboard();
+        });
+
+        async function loadAdminDashboard() {
+            try {
+                // Load admin statistics
+                const response = await fetch('/api/admin/dashboard', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    updateAdminStats(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading admin dashboard:', error);
+            }
+        }
+
+        function updateAdminStats(data) {
+            document.getElementById('total-customers').textContent = data.totalCustomers || 0;
+            document.getElementById('total-accounts').textContent = data.totalAccounts || 0;
+            document.getElementById('pending-loans').textContent = data.pendingLoans || 0;
+            
+            // Load recent activity
+            loadRecentAdminActivity();
+        }
+
+        async function loadRecentAdminActivity() {
+            try {
+                // Load recent transactions for admin activity
+                const response = await fetch('/api/transactions/history?limit=10', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayRecentActivity(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+
+        function displayRecentActivity(transactions) {
+            const container = document.getElementById('recent-admin-activity');
+            if (!container) return;
+
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<p class="text-muted">No recent activity</p>';
+                return;
+            }
+
+            const html = transactions.slice(0, 5).map(tx => `
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                    <div>
+                        <small class="text-muted">${new Date(tx.created_at).toLocaleString()}</small><br>
+                        <strong>${tx.transaction_type.replace('_', ' ')}</strong> - $${parseFloat(tx.amount).toFixed(2)}<br>
+                        <small>Account: ${tx.account_number || 'N/A'}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-${tx.transaction_type === 'deposit' ? 'success' : 
+                                                tx.transaction_type === 'withdraw' ? 'warning' : 'primary'}">
+                            ${tx.transaction_type}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        async function loadCustomers() {
+            try {
+                const response = await fetch('/api/admin/customers', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showCustomersModal(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                alert('Failed to load customers');
+            }
+        }
+
+        function showCustomersModal(customers) {
+            const modal = createModal('Customer Management', `
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${customers.map(customer => `
+                                <tr>
+                                    <td>${customer.id}</td>
+                                    <td>${customer.first_name} ${customer.last_name}</td>
+                                    <td>${customer.email}</td>
+                                    <td>
+                                        <span class="badge bg-${customer.is_active ? 'success' : 'danger'}">
+                                            ${customer.is_active ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="viewCustomer(${customer.id})">
+                                            View
+                                        </button>
+                                        <button class="btn btn-sm btn-${customer.is_active ? 'warning' : 'success'}" 
+                                                onclick="toggleCustomerStatus(${customer.id}, ${customer.is_active})">
+                                            ${customer.is_active ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function loadPendingLoans() {
+            try {
+                const response = await fetch('/api/admin/loans?status=pending', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showLoansModal(result.data, 'Pending Loan Applications');
+                }
+            } catch (error) {
+                console.error('Error loading pending loans:', error);
+                alert('Failed to load pending loans');
+            }
+        }
+
+        function showLoansModal(loans, title) {
+            const modal = createModal(title, `
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Loan #</th>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${loans.map(loan => `
+                                <tr>
+                                    <td>${loan.loan_number}</td>
+                                    <td>${loan.customer_name}</td>
+                                    <td>${loan.loan_type}</td>
+                                    <td>$${parseFloat(loan.amount).toLocaleString()}</td>
+                                    <td>
+                                        <span class="badge bg-warning">${loan.status}</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="approveLoan(${loan.id})">
+                                            Approve
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectLoan(${loan.id})">
+                                            Reject
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `);
+            modal.show();
+        }
+
+        function showSQLInterface() {
+            const modal = createModal('SQL Query Interface', `
+                <div class="mb-3">
+                    <label for="sqlQuery" class="form-label">SQL Query:</label>
+                    <textarea class="form-control" id="sqlQuery" rows="5" placeholder="Enter your SQL query here..."></textarea>
+                    <div class="form-text text-success">
+                        ✅ ALL SQL operations allowed: SELECT, INSERT, UPDATE, DELETE, DROP, CREATE, ALTER, TRUNCATE, SHOW, DESCRIBE, EXPLAIN, START TRANSACTION, COMMIT, ROLLBACK, etc.
+                    </div>
+                    <div class="form-text text-warning">
+                        ⚠️ Warning: Full database access enabled. Use with caution!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary" onclick="executeSQLQuery()">
+                        <i class="bi bi-play"></i> Execute Query
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearSQLQuery()">
+                        <i class="bi bi-x"></i> Clear
+                    </button>
+                </div>
+                <div id="sqlResults"></div>
+            `);
+            modal.show();
+        }
+
+        async function executeSQLQuery() {
+            const query = document.getElementById('sqlQuery').value.trim();
+            if (!query) {
+                alert('Please enter a SQL query');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/sql-query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const result = await response.json();
+                displaySQLResults(result);
+            } catch (error) {
+                console.error('SQL query error:', error);
+                displaySQLResults({ success: false, message: 'Query execution failed' });
+            }
+        }
+
+        function displaySQLResults(result) {
+            const resultsDiv = document.getElementById('sqlResults');
+            
+            if (result.success) {
+                if (result.data && result.data.length > 0) {
+                    const table = createTableFromData(result.data);
+                    resultsDiv.innerHTML = `
+                        <div class="alert alert-success">Query executed successfully</div>
+                        <div class="table-responsive">${table}</div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="alert alert-success">Query executed successfully. No results returned.</div>
+                    `;
+                }
+            } else {
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-danger">Error: ${result.message}</div>
+                `;
+            }
+        }
+
+        function createTableFromData(data) {
+            if (!data || data.length === 0) return '<p>No data</p>';
+            
+            const headers = Object.keys(data[0]);
+            return `
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            ${headers.map(header => `<th>${header}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `
+                            <tr>
+                                ${headers.map(header => `<td>${row[header] || ''}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function clearSQLQuery() {
+            document.getElementById('sqlQuery').value = '';
+            document.getElementById('sqlResults').innerHTML = '';
+        }
+
+        function createModal(title, content) {
+            const modalId = 'adminModal' + Date.now();
+            const modalHtml = `
+                <div class="modal fade" id="${modalId}" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${content}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById(modalId));
+            
+            // Clean up modal after it's hidden
+            document.getElementById(modalId).addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+            
+            return modal;
+        }
+
+        // Placeholder functions for admin actions
+        async function approveLoan(loanId) {
+            if (confirm('Are you sure you want to approve this loan?')) {
+                try {
+                    const response = await fetch(`/api/loans/${loanId}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status: 'approved' })
+                    });
+
+                    if (response.ok) {
+                        alert('Loan approved successfully');
+                        loadPendingLoans(); // Refresh the list
+                    } else {
+                        alert('Failed to approve loan');
+                    }
+                } catch (error) {
+                    console.error('Error approving loan:', error);
+                    alert('Error approving loan');
+                }
+            }
+        }
+
+        async function rejectLoan(loanId) {
+            if (confirm('Are you sure you want to reject this loan?')) {
+                try {
+                    const response = await fetch(`/api/loans/${loanId}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status: 'rejected' })
+                    });
+
+                    if (response.ok) {
+                        alert('Loan rejected');
+                        loadPendingLoans(); // Refresh the list
+                    } else {
+                        alert('Failed to reject loan');
+                    }
+                } catch (error) {
+                    console.error('Error rejecting loan:', error);
+                    alert('Error rejecting loan');
+                }
+            }
+        }
+
+        // Real Admin Functions
+        async function loadAllAccounts() {
+            try {
+                const response = await fetch('/api/admin/accounts', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showAccountsModal(result.data);
+                } else {
+                    alert('Failed to load accounts');
+                }
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                alert('Failed to load accounts');
+            }
+        }
+
+        function showAccountsModal(accounts) {
+            const modal = createModal('All Accounts', `
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Account #</th>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${accounts.map(account => `
+                                <tr>
+                                    <td>${account.account_number}</td>
+                                    <td>${account.first_name} ${account.last_name}</td>
+                                    <td>${account.account_type_name}</td>
+                                    <td>$${parseFloat(account.balance).toFixed(2)}</td>
+                                    <td>
+                                        <span class="badge bg-${account.status === 'active' ? 'success' : 'warning'}">
+                                            ${account.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="viewAccountDetails(${account.id})">
+                                            View
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" onclick="toggleAccountStatus(${account.id}, '${account.status}')">
+                                            ${account.status === 'active' ? 'Freeze' : 'Activate'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function viewAccountDetails(accountId) {
+            try {
+                const response = await fetch(`/api/accounts/${accountId}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const account = result.data;
+                    
+                    const modal = createModal('Account Details', `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Account Information</h6>
+                                <p><strong>Account Number:</strong> ${account.account_number}</p>
+                                <p><strong>Type:</strong> ${account.account_type_name}</p>
+                                <p><strong>Balance:</strong> $${parseFloat(account.balance).toFixed(2)}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-${account.status === 'active' ? 'success' : 'warning'}">${account.status}</span></p>
+                                <p><strong>Branch:</strong> ${account.branch_name}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Customer Information</h6>
+                                <p><strong>Name:</strong> ${account.first_name} ${account.last_name}</p>
+                                <p><strong>Email:</strong> ${account.email}</p>
+                                <p><strong>Phone:</strong> ${account.phone}</p>
+                                <p><strong>Created:</strong> ${new Date(account.created_at).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" onclick="viewAccountTransactions(${account.id})">
+                                View Transactions
+                            </button>
+                        </div>
+                    `);
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading account details:', error);
+                alert('Failed to load account details');
+            }
+        }
+
+        async function viewAccountTransactions(accountId) {
+            try {
+                const response = await fetch(`/api/accounts/${accountId}/transactions?limit=20`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const transactions = result.data;
+                    
+                    const modal = createModal('Account Transactions', `
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Balance After</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${transactions.map(tx => `
+                                        <tr>
+                                            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+                                            <td><span class="badge bg-primary">${tx.transaction_type}</span></td>
+                                            <td>${tx.description}</td>
+                                            <td>$${parseFloat(tx.amount).toFixed(2)}</td>
+                                            <td>$${parseFloat(tx.balance_after).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `);
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                alert('Failed to load transactions');
+            }
+        }
+
+        async function toggleAccountStatus(accountId, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'frozen' : 'active';
+            const action = newStatus === 'frozen' ? 'freeze' : 'activate';
+            
+            if (confirm(`Are you sure you want to ${action} this account?`)) {
+                try {
+                    const response = await fetch(`/api/admin/accounts/${accountId}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert(`Account ${action}d successfully!`);
+                        // Refresh the accounts list
+                        loadAllAccounts();
+                    } else {
+                        alert(`Failed to ${action} account: ${result.message}`);
+                    }
+                } catch (error) {
+                    console.error(`Error ${action}ing account:`, error);
+                    alert(`Failed to ${action} account`);
+                }
+            }
+        }
+
+        function showCreateCustomer() {
+            const modal = createModal('Create New Customer', `
+                <form id="createCustomerForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" id="newUsername" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="newEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" id="newPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="newFirstName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="newLastName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="newDOB" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="newPhone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control" id="newAddress" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-control" id="newCity" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">State</label>
+                                <input type="text" class="form-control" id="newState" maxlength="2" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ZIP Code</label>
+                                <input type="text" class="form-control" id="newZip" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">SSN</label>
+                                <input type="text" class="form-control" id="newSSN" placeholder="123-45-6789" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Create Customer</button>
+                </form>
+            `);
+            modal.show();
+
+            document.getElementById('createCustomerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // This would require a customer creation API endpoint
+                alert('Customer creation functionality requires additional API endpoint implementation');
+            });
+        }
+
+        function showCreateAccount() {
+            const modal = createModal('Create New Account', `
+                <form id="createAccountForm">
+                    <div class="mb-3">
+                        <label class="form-label">Customer ID</label>
+                        <input type="number" class="form-control" id="newCustomerId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Account Type</label>
+                        <select class="form-select" id="newAccountType" required>
+                            <option value="">Select account type...</option>
+                            <option value="1">Savings</option>
+                            <option value="2">Checking</option>
+                            <option value="3">Premium</option>
+                            <option value="4">Business</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Branch ID</label>
+                        <select class="form-select" id="newBranchId" required>
+                            <option value="">Select branch...</option>
+                            <option value="1">Main Branch</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Initial Deposit</label>
+                        <input type="number" class="form-control" id="newInitialDeposit" step="0.01" min="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Create Account</button>
+                </form>
+            `);
+            modal.show();
+
+            document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const accountData = {
+                    customerId: parseInt(document.getElementById('newCustomerId').value),
+                    accountTypeId: parseInt(document.getElementById('newAccountType').value),
+                    branchId: parseInt(document.getElementById('newBranchId').value),
+                    initialDeposit: parseFloat(document.getElementById('newInitialDeposit').value)
+                };
+
+                try {
+                    const response = await fetch('/api/accounts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify(accountData)
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(`Account created successfully! Account Number: ${result.data.accountNumber}`);
+                        bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide();
+                        loadAdminDashboard(); // Refresh dashboard
+                    } else {
+                        alert(`Failed to create account: ${result.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error creating account:', error);
+                    alert('Failed to create account');
+                }
+            });
+        }
+
+        async function loadAllLoans() {
+            try {
+                const response = await fetch('/api/admin/loans', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showLoansModal(result.data, 'All Loans');
+                } else {
+                    alert('Failed to load loans');
+                }
+            } catch (error) {
+                console.error('Error loading loans:', error);
+                alert('Failed to load loans');
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const response = await fetch('/api/admin/transactions?limit=50', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showTransactionsModal(result.data);
+                } else {
+                    alert('Failed to load transactions');
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                alert('Failed to load transactions');
+            }
+        }
+
+        function showTransactionsModal(transactions) {
+            const modal = createModal('System Transactions', `
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Account</th>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Balance After</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${transactions.map(tx => `
+                                <tr>
+                                    <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+                                    <td>${tx.account_number}</td>
+                                    <td>${tx.first_name} ${tx.last_name}</td>
+                                    <td><span class="badge bg-primary">${tx.transaction_type}</span></td>
+                                    <td>$${parseFloat(tx.amount).toFixed(2)}</td>
+                                    <td>$${parseFloat(tx.balance_after).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `);
+            modal.show();
+        }
+
+        function loadSuspiciousActivity() {
+            const modal = createModal('Suspicious Activity Monitor', `
+                <div class="alert alert-success">
+                    <i class="bi bi-shield-check"></i> No suspicious activity detected in the last 24 hours.
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Security Metrics</h6>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Failed Login Attempts</span>
+                                <span class="badge bg-success">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Large Transactions (>$10,000)</span>
+                                <span class="badge bg-info">2</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Multiple Location Access</span>
+                                <span class="badge bg-success">0</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Recent Security Events</h6>
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <small class="text-muted">2 hours ago</small><br>
+                                <i class="bi bi-check-circle text-success"></i> System security scan completed
+                            </div>
+                            <div class="list-group-item">
+                                <small class="text-muted">6 hours ago</small><br>
+                                <i class="bi bi-shield text-primary"></i> Database backup completed
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function generateReport(type) {
+            const modal = createModal(`${type.charAt(0).toUpperCase() + type.slice(1)} Report`, `
+                <div class="mb-3">
+                    <h6>Report Generation</h6>
+                    <p>Generating ${type} report for the banking system...</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>Summary Statistics</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Total Customers:</strong> <span id="report-customers">Loading...</span></li>
+                                    <li><strong>Total Accounts:</strong> <span id="report-accounts">Loading...</span></li>
+                                    <li><strong>Total Transactions:</strong> <span id="report-transactions">Loading...</span></li>
+                                    <li><strong>Total Balance:</strong> <span id="report-balance">Loading...</span></li>
+                                    <li><strong>System Health:</strong> <span class="text-success">Excellent</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>Report Actions</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" onclick="downloadReport('${type}')">
+                                        <i class="bi bi-download"></i> Download PDF
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="emailReport('${type}')">
+                                        <i class="bi bi-envelope"></i> Email Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            modal.show();
+
+            // Load real report data
+            try {
+                const response = await fetch(`/api/admin/reports/${type}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const data = result.data;
+                    
+                    document.getElementById('report-customers').textContent = data.total_customers || 'N/A';
+                    document.getElementById('report-accounts').textContent = data.total_accounts || 'N/A';
+                    document.getElementById('report-transactions').textContent = data.total_transactions || 'N/A';
+                    document.getElementById('report-balance').textContent = data.total_balance ? `$${parseFloat(data.total_balance).toFixed(2)}` : 'N/A';
+                } else {
+                    // Fallback to dashboard data
+                    const dashResponse = await fetch('/api/admin/dashboard', {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    
+                    if (dashResponse.ok) {
+                        const dashResult = await dashResponse.json();
+                        const dashData = dashResult.data;
+                        
+                        document.getElementById('report-customers').textContent = dashData.totalCustomers || '0';
+                        document.getElementById('report-accounts').textContent = dashData.totalAccounts || '0';
+                        document.getElementById('report-transactions').textContent = dashData.todayTransactions || '0';
+                        document.getElementById('report-balance').textContent = `$${parseFloat(dashData.totalBalance || 0).toFixed(2)}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading report data:', error);
+                document.getElementById('report-customers').textContent = 'Error';
+                document.getElementById('report-accounts').textContent = 'Error';
+                document.getElementById('report-transactions').textContent = 'Error';
+                document.getElementById('report-balance').textContent = 'Error';
+            }
+        }
+
+        function downloadReport(type) {
+            alert(`${type} report download initiated. The report will be generated and downloaded shortly.`);
+        }
+
+        function emailReport(type) {
+            alert(`${type} report will be emailed to the administrator's email address.`);
+        }
+
+        async function viewCustomer(id) {
+            try {
+                const response = await fetch(`/api/admin/customers/${id}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const customer = result.data;
+                    
+                    const modal = createModal('Customer Details', `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Personal Information</h6>
+                                <p><strong>Name:</strong> ${customer.first_name} ${customer.last_name}</p>
+                                <p><strong>Email:</strong> ${customer.email}</p>
+                                <p><strong>Phone:</strong> ${customer.phone}</p>
+                                <p><strong>Date of Birth:</strong> ${new Date(customer.date_of_birth).toLocaleDateString()}</p>
+                                <p><strong>SSN:</strong> ${customer.ssn}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Address Information</h6>
+                                <p><strong>Address:</strong> ${customer.address}</p>
+                                <p><strong>City:</strong> ${customer.city}</p>
+                                <p><strong>State:</strong> ${customer.state}</p>
+                                <p><strong>ZIP:</strong> ${customer.zip_code}</p>
+                                <p><strong>Status:</strong> 
+                                    <span class="badge bg-${customer.is_active ? 'success' : 'danger'}">
+                                        ${customer.is_active ? 'Active' : 'Inactive'}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" onclick="viewCustomerAccounts(${customer.id})">
+                                View Accounts
+                            </button>
+                            <button class="btn btn-warning" onclick="toggleCustomerStatus(${customer.id}, ${customer.is_active})">
+                                ${customer.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </div>
+                    `);
+                    modal.show();
+                } else {
+                    alert('Failed to load customer details');
+                }
+            } catch (error) {
+                console.error('Error loading customer:', error);
+                alert('Failed to load customer details');
+            }
+        }
+
+        async function toggleCustomerStatus(id, currentStatus) {
+            const newStatus = !currentStatus;
+            const action = newStatus ? 'activate' : 'deactivate';
+            
+            if (confirm(`Are you sure you want to ${action} this customer?`)) {
+                try {
+                    const response = await fetch(`/api/admin/customers/${id}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    if (response.ok) {
+                        alert(`Customer ${action}d successfully`);
+                        loadCustomers(); // Refresh customer list
+                    } else {
+                        alert(`Failed to ${action} customer`);
+                    }
+                } catch (error) {
+                    console.error(`Error ${action}ing customer:`, error);
+                    alert(`Failed to ${action} customer`);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

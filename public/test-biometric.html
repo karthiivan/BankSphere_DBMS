@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Biometric - BankSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-fingerprint"></i> Biometric Support Test
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Checking your device...</h5>
+                        <div id="results" class="mt-3"></div>
+                        
+                        <div class="mt-4">
+                            <button class="btn btn-primary" onclick="testBiometric()">
+                                <i class="bi bi-fingerprint"></i> Test Biometric Registration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        async function checkSupport() {
+            const results = document.getElementById('results');
+            let html = '<div class="list-group">';
+            
+            // Check 1: PublicKeyCredential
+            if (window.PublicKeyCredential) {
+                html += '<div class="list-group-item list-group-item-success"><i class="bi bi-check-circle"></i> ✅ WebAuthn API is supported</div>';
+            } else {
+                html += '<div class="list-group-item list-group-item-danger"><i class="bi bi-x-circle"></i> ❌ WebAuthn API is NOT supported</div>';
+            }
+            
+            // Check 2: navigator.credentials
+            if (navigator.credentials) {
+                html += '<div class="list-group-item list-group-item-success"><i class="bi bi-check-circle"></i> ✅ Credentials API is supported</div>';
+            } else {
+                html += '<div class="list-group-item list-group-item-danger"><i class="bi bi-x-circle"></i> ❌ Credentials API is NOT supported</div>';
+            }
+            
+            // Check 3: Platform Authenticator
+            if (window.PublicKeyCredential && window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+                try {
+                    const available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                    if (available) {
+                        html += '<div class="list-group-item list-group-item-success"><i class="bi bi-check-circle"></i> ✅ Platform Authenticator (Windows Hello/Fingerprint) is AVAILABLE</div>';
+                        html += '<div class="list-group-item list-group-item-info"><i class="bi bi-info-circle"></i> 🎉 Your device supports biometric authentication!</div>';
+                    } else {
+                        html += '<div class="list-group-item list-group-item-warning"><i class="bi bi-exclamation-triangle"></i> ⚠️ Platform Authenticator is NOT available</div>';
+                        html += '<div class="list-group-item list-group-item-info"><i class="bi bi-info-circle"></i> Please set up Windows Hello:<br>1. Go to Windows Settings<br>2. Accounts → Sign-in options<br>3. Set up PIN, Fingerprint, or Face recognition</div>';
+                    }
+                } catch (error) {
+                    html += '<div class="list-group-item list-group-item-danger"><i class="bi bi-x-circle"></i> ❌ Error checking authenticator: ' + error.message + '</div>';
+                }
+            } else {
+                html += '<div class="list-group-item list-group-item-danger"><i class="bi bi-x-circle"></i> ❌ Platform Authenticator check not available</div>';
+            }
+            
+            // Browser info
+            html += '<div class="list-group-item"><strong>Browser:</strong> ' + navigator.userAgent + '</div>';
+            
+            html += '</div>';
+            results.innerHTML = html;
+        }
+        
+        async function testBiometric() {
+            try {
+                const available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!available) {
+                    alert('❌ Platform authenticator not available.\n\nPlease set up Windows Hello first:\n1. Windows Settings\n2. Accounts → Sign-in options\n3. Set up PIN, Fingerprint, or Face');
+                    return;
+                }
+                
+                // Try to create a credential
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                
+                const publicKeyCredentialCreationOptions = {
+                    challenge: challenge,
+                    rp: {
+                        name: "BankSphere Test",
+                        id: window.location.hostname
+                    },
+                    user: {
+                        id: new Uint8Array(16),
+                        name: "testuser",
+                        displayName: "Test User"
+                    },
+                    pubKeyCredParams: [
+                        { alg: -7, type: "public-key" },
+                        { alg: -257, type: "public-key" }
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required"
+                    },
+                    timeout: 60000
+                };
+                
+                const credential = await navigator.credentials.create({
+                    publicKey: publicKeyCredentialCreationOptions
+                });
+                
+                alert('✅ SUCCESS!\n\nBiometric registration worked!\nYour fingerprint sensor is working correctly.\n\nYou can now use biometric login in BankSphere!');
+                
+            } catch (error) {
+                alert('❌ Test failed:\n\n' + error.message + '\n\nPlease make sure:\n1. Windows Hello is set up\n2. Your fingerprint sensor is working\n3. You touched the sensor when prompted');
+                console.error('Biometric test error:', error);
+            }
+        }
+        
+        // Run check on load
+        checkSupport();
+    </script>
+</body>
+</html>

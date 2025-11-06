@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking Test - BankSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Banking Functionality Test</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Login Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" onclick="testLogin()">Test Customer Login</button>
+                        <div id="loginResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Account Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-info" onclick="testAccounts()">Load Accounts</button>
+                        <div id="accountResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Deposit Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="number" id="depositAmount" class="form-control mb-2" placeholder="Amount" value="100">
+                        <button class="btn btn-success" onclick="testDeposit()">Test Deposit</button>
+                        <div id="depositResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Withdrawal Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="number" id="withdrawAmount" class="form-control mb-2" placeholder="Amount" value="50">
+                        <button class="btn btn-warning" onclick="testWithdraw()">Test Withdrawal</button>
+                        <div id="withdrawResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Transfer Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="number" id="transferAmount" class="form-control mb-2" placeholder="Amount" value="25">
+                        <input type="text" id="toAccount" class="form-control mb-2" placeholder="To Account" value="ACC001000002">
+                        <button class="btn btn-primary" onclick="testTransfer()">Test Transfer</button>
+                        <div id="transferResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Transaction History</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-info" onclick="testTransactionHistory()">Load Transaction History</button>
+                        <div id="historyResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let token = '';
+
+        async function testLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'john_doe', password: 'password123' })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    token = result.token;
+                    document.getElementById('loginResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Login successful!</div>';
+                } else {
+                    document.getElementById('loginResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Login failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testAccounts() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/accounts', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const accounts = result.data.map(acc => 
+                        `<li>${acc.account_type_name} - ${acc.account_number}: $${parseFloat(acc.balance).toFixed(2)}</li>`
+                    ).join('');
+                    document.getElementById('accountResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Accounts loaded:<ul>' + accounts + '</ul></div>';
+                } else {
+                    document.getElementById('accountResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('accountResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testDeposit() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            const amount = document.getElementById('depositAmount').value;
+            
+            try {
+                const response = await fetch('/api/transactions/deposit', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ 
+                        accountId: 1, 
+                        amount: parseFloat(amount), 
+                        description: 'Test deposit' 
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('depositResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Deposit successful! New balance: $' + 
+                        result.data.newBalance.toFixed(2) + '</div>';
+                } else {
+                    document.getElementById('depositResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('depositResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testWithdraw() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            const amount = document.getElementById('withdrawAmount').value;
+            
+            try {
+                const response = await fetch('/api/transactions/withdraw', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ 
+                        accountId: 1, 
+                        amount: parseFloat(amount), 
+                        description: 'Test withdrawal' 
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('withdrawResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Withdrawal successful! New balance: $' + 
+                        result.data.newBalance.toFixed(2) + '</div>';
+                } else {
+                    document.getElementById('withdrawResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('withdrawResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testTransfer() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            const amount = document.getElementById('transferAmount').value;
+            const toAccount = document.getElementById('toAccount').value;
+            
+            try {
+                const response = await fetch('/api/transactions/transfer', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ 
+                        fromAccountId: 1, 
+                        toAccountNumber: toAccount,
+                        amount: parseFloat(amount), 
+                        description: 'Test transfer' 
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('transferResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Transfer successful! New balance: $' + 
+                        result.data.newSourceBalance.toFixed(2) + '</div>';
+                } else {
+                    document.getElementById('transferResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('transferResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testTransactionHistory() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/transactions/history?limit=10', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const transactions = result.data.map(tx => 
+                        `<tr>
+                            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+                            <td>${tx.transaction_type}</td>
+                            <td>${tx.description}</td>
+                            <td>$${parseFloat(tx.amount).toFixed(2)}</td>
+                            <td>$${parseFloat(tx.balance_after).toFixed(2)}</td>
+                        </tr>`
+                    ).join('');
+                    document.getElementById('historyResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Transaction history loaded:</div>' +
+                        '<table class="table table-sm"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th>Balance</th></tr></thead><tbody>' + 
+                        transactions + '</tbody></table>';
+                } else {
+                    document.getElementById('historyResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('historyResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
