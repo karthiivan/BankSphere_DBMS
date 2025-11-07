@@ -11,12 +11,12 @@ const { authenticateToken } = require('../middleware/auth');
 router.post('/register', authLimit, [
     body('username').isLength({ min: 3, max: 50 }).matches(/^[a-zA-Z0-9_]+$/),
     body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 6 }), // Simplified - just minimum 6 characters
+    body('password').isLength({ min: 6 }),
     body('firstName').isLength({ min: 1, max: 50 }),
     body('lastName').isLength({ min: 1, max: 50 }),
     body('dateOfBirth').optional().isISO8601(),
-    body('phone').optional().matches(/^\(\d{3}\) \d{3}-\d{4}$/),
-    body('ssn').optional().matches(/^\d{3}-\d{2}-\d{4}$/)
+    body('phone').optional(),
+    body('ssn').optional()
 ], async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -35,7 +35,7 @@ router.post('/register', authLimit, [
 
         // Check if user already exists
         const existingUser = await executeQuery(
-            'SELECT id FROM users WHERE username = ? OR email = ?',
+            'SELECT id FROM users WHERE username = $1 OR email = $2',
             [username, email]
         );
 
@@ -50,19 +50,19 @@ router.post('/register', authLimit, [
         const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
-        // Create user
+        // Create user - PostgreSQL returns the inserted row with RETURNING
         const userResult = await executeQuery(
-            'INSERT INTO users (username, email, password_hash, role, is_active, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-            [username, email, passwordHash, 'customer', 1]
+            'INSERT INTO users (username, email, password, role, is_active) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [username, email, passwordHash, 'customer', true]
         );
 
-        const userId = userResult.insertId;
+        const userId = userResult[0].id;
 
-        // Create customer profile with default values for optional fields
+        // Create customer profile
         const customerResult = await executeQuery(
             `INSERT INTO customers (user_id, first_name, last_name, date_of_birth, phone, 
-             address, city, state, zip_code, ssn, created_at) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+             address, city, state, zip_code, ssn) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
             [
                 userId, 
                 firstName, 
@@ -77,108 +77,45 @@ router.post('/register', authLimit, [
             ]
         );
 
-        const customerId = customerResult.insertId;
-
-        // Set up biometric authentication (placeholder - ready for enrollment)
-        console.log(`Setting up biometric authentication for ${username}...`);
-        const bioId = require('crypto').randomUUID();
-        await executeQuery(
-            `INSERT INTO biometric_data (id, user_id, biometric_type, encrypted_template, is_active, created_at)
-             VALUES (?, ?, 'fingerprint', 'PENDING_ENROLLMENT', 1, NOW())`,
-            [bioId, userId]
-        );
-        console.log('✅ Biometric authentication ready for enrollment');
-
-        // Automatically create accounts with initial balance
-        console.log(`Creating accounts for new customer ${customerId}...`);
-
-        // Get account types
-        const accountTypes = await executeQuery('SELECT id, name FROM account_types');
-        const checkingTypeId = accountTypes.find(t => t.name === 'Checking')?.id || 1;
-        const savingsTypeId = accountTypes.find(t => t.name === 'Savings')?.id || 2;
-
-        // Get first branch
-        const branches = await executeQuery('SELECT id FROM branches LIMIT 1');
-        const branchId = branches.length > 0 ? branches[0].id : 1;
+        const customerId = customerResult[0].id;
 
         // Create Checking Account with $5,000 initial balance
-        const checkingAccountNumber = `ACC${customerId.toString().padStart(3, '0')}000001`;
+        const checkingAccountNumber = `ACC${customerId.toString().padStart(6, '0')}001`;
         const checkingResult = await executeQuery(
-            `INSERT INTO accounts (customer_id, account_type_id, account_number, balance, branch_id, status, created_at)
-             VALUES (?, ?, ?, 5000.00, ?, 'active', NOW())`,
-            [customerId, checkingTypeId, checkingAccountNumber, branchId]
+            `INSERT INTO accounts (customer_id, account_number, account_type, balance, status)
+             VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+            [customerId, checkingAccountNumber, 'checking', 5000.00, 'active']
         );
 
+        const checkingAccountId = checkingResult[0].id;
+
         // Add initial deposit transaction for checking
+        const txId1 = require('crypto').randomUUID();
         await executeQuery(
-            `INSERT INTO transactions (account_id, transaction_type, amount, description, balance_after, created_at)
-             VALUES (?, 'deposit', 5000.00, 'Welcome bonus - Initial deposit', 5000.00, NOW())`,
-            [checkingResult.insertId]
+            `INSERT INTO transactions (id, account_id, transaction_type, amount, description, balance_after)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [txId1, checkingAccountId, 'deposit', 5000.00, 'Welcome bonus - Initial deposit', 5000.00]
         );
 
         // Create Savings Account with $3,000 initial balance
-        const savingsAccountNumber = `ACC${customerId.toString().padStart(3, '0')}000002`;
+        const savingsAccountNumber = `ACC${customerId.toString().padStart(6, '0')}002`;
         const savingsResult = await executeQuery(
-            `INSERT INTO accounts (customer_id, account_type_id, account_number, balance, branch_id, status, created_at)
-             VALUES (?, ?, ?, 3000.00, ?, 'active', NOW())`,
-            [customerId, savingsTypeId, savingsAccountNumber, branchId]
+            `INSERT INTO accounts (customer_id, account_number, account_type, balance, status)
+             VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+            [customerId, savingsAccountNumber, 'savings', 3000.00, 'active']
         );
+
+        const savingsAccountId = savingsResult[0].id;
 
         // Add initial deposit transaction for savings
+        const txId2 = require('crypto').randomUUID();
         await executeQuery(
-            `INSERT INTO transactions (account_id, transaction_type, amount, description, balance_after, created_at)
-             VALUES (?, 'deposit', 3000.00, 'Welcome bonus - Initial deposit', 3000.00, NOW())`,
-            [savingsResult.insertId]
+            `INSERT INTO transactions (id, account_id, transaction_type, amount, description, balance_after)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [txId2, savingsAccountId, 'deposit', 3000.00, 'Welcome bonus - Initial deposit', 3000.00]
         );
 
-        // Add minimal crypto holdings (just placeholders with 0 balance)
-        const cryptoHoldings = [
-            { symbol: 'BTC', name: 'Bitcoin', amount: 0, avgPrice: 45000.00 },
-            { symbol: 'ETH', name: 'Ethereum', amount: 0, avgPrice: 2900.00 },
-            { symbol: 'ADA', name: 'Cardano', amount: 0, avgPrice: 0.50 }
-        ];
-
-        for (const crypto of cryptoHoldings) {
-            await executeQuery(
-                `INSERT INTO crypto_wallets (customer_id, crypto_symbol, crypto_name, amount, average_price, created_at)
-                 VALUES (?, ?, ?, ?, ?, NOW())`,
-                [customerId, crypto.symbol, crypto.name, crypto.amount, crypto.avgPrice]
-            );
-        }
-
-        // Create welcome support ticket
-        const ticketId = require('crypto').randomUUID();
-        await executeQuery(
-            `INSERT INTO support_tickets (id, customer_id, subject, description, status, priority, created_at)
-             VALUES (?, ?, ?, ?, 'open', 'low', NOW())`,
-            [ticketId, customerId, 'Welcome to BankSphere!', 
-             'Thank you for joining BankSphere! Your accounts are ready. If you need any assistance, feel free to reach out to our support team.']
-        );
-        console.log('✅ Welcome ticket created');
-
-        // Create initial budget categories
-        const budgetCategories = [
-            { name: 'Groceries', amount: 500, period: 'monthly' },
-            { name: 'Entertainment', amount: 200, period: 'monthly' },
-            { name: 'Transportation', amount: 300, period: 'monthly' }
-        ];
-
-        for (const budget of budgetCategories) {
-            const budgetId = require('crypto').randomUUID();
-            await executeQuery(
-                `INSERT INTO budgets (id, customer_id, name, total_amount, period, start_date, end_date, status, created_at)
-                 VALUES (?, ?, ?, ?, ?, DATE_FORMAT(NOW(), '%Y-%m-01'), LAST_DAY(NOW()), 'active', NOW())`,
-                [budgetId, customerId, budget.name, budget.amount, budget.period]
-            );
-        }
-        console.log('✅ Budget categories created');
-
-        console.log(`\n✅ Registration complete for ${username}:`);
-        console.log(`   - Checking: ${checkingAccountNumber} ($5,000)`);
-        console.log(`   - Savings: ${savingsAccountNumber} ($3,000)`);
-        console.log(`   - Crypto wallets: Ready (0 balance)`);
-        console.log(`   - Biometric: Ready for enrollment`);
-        console.log(`   - Budgets: 3 categories set up`);
+        console.log(`✅ Registration complete for ${username}`);
 
         res.status(201).json({
             success: true,
@@ -191,9 +128,7 @@ router.post('/register', authLimit, [
                     { type: 'Checking', number: checkingAccountNumber, balance: 5000 },
                     { type: 'Savings', number: savingsAccountNumber, balance: 3000 }
                 ],
-                totalBalance: 8000,
-                biometricReady: true,
-                budgetsCreated: 3
+                totalBalance: 8000
             }
         });
 
@@ -224,7 +159,7 @@ router.post('/login', authLimit, [
 
         // Get user
         const users = await executeQuery(
-            'SELECT * FROM users WHERE username = ? AND is_active = 1',
+            'SELECT * FROM users WHERE username = $1 AND is_active = true',
             [username]
         );
 
@@ -238,7 +173,7 @@ router.post('/login', authLimit, [
         const user = users[0];
 
         // Verify password
-        const isValidPassword = await bcrypt.compare(password, user.password_hash);
+        const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
             return res.status(401).json({
                 success: false,
@@ -248,7 +183,7 @@ router.post('/login', authLimit, [
 
         // Get customer ID
         const customerData = await executeQuery(
-            'SELECT id FROM customers WHERE user_id = ?',
+            'SELECT id FROM customers WHERE user_id = $1',
             [user.id]
         );
         const customerId = customerData.length > 0 ? customerData[0].id : null;
@@ -295,7 +230,7 @@ router.get('/me', authenticateToken, async (req, res) => {
                     c.id as customerId, c.first_name, c.last_name
              FROM users u 
              LEFT JOIN customers c ON u.id = c.user_id 
-             WHERE u.id = ?`,
+             WHERE u.id = $1`,
             [req.user.userId]
         );
 
@@ -352,7 +287,7 @@ router.post('/verify-password', authenticateToken, async (req, res) => {
         
         // Get user's hashed password and username
         const users = await executeQuery(
-            'SELECT u.password_hash, u.username FROM users u WHERE u.id = ?',
+            'SELECT u.password, u.username FROM users u WHERE u.id = $1',
             [req.user.userId]
         );
         
@@ -372,7 +307,7 @@ router.post('/verify-password', authenticateToken, async (req, res) => {
         }
         
         // Compare password with hash
-        const isValid = await bcrypt.compare(password, users[0].password_hash);
+        const isValid = await bcrypt.compare(password, users[0].password);
         
         if (isValid) {
             res.json({
