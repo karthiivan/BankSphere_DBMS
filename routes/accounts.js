@@ -133,18 +133,18 @@ router.post('/', authenticateToken, requireRole(['employee', 'admin']), [
         const result = await executeQuery(
             `INSERT INTO accounts (customer_id, account_type_id, branch_id, account_number, 
                                  balance, status, created_at) 
-             VALUES (?, ?, ?, ?, ?, 'active', NOW())`,
+             VALUES ($1, $2, $3, $4, $5, 'active', CURRENT_TIMESTAMP) RETURNING id`,
             [customerId, accountTypeId, branchId, accountNumber, initialDeposit]
         );
 
-        const accountId = result.insertId;
+        const accountId = result[0].id;
 
         // Create initial deposit transaction if amount > 0
         if (initialDeposit > 0) {
             await executeQuery(
                 `INSERT INTO transactions (account_id, transaction_type, amount, description, 
                                          balance_after, created_at)
-                 VALUES (?, 'deposit', ?, 'Initial deposit', ?, NOW())`,
+                 VALUES ($1, 'deposit', $2, 'Initial deposit', $3, CURRENT_TIMESTAMP)`,
                 [accountId, initialDeposit, initialDeposit]
             );
         }
