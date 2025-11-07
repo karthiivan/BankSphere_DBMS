@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankSphere - Modern Banking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .login-card {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bank"></i> BankSphere
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showLogin()">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showRegister()">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 mb-4">Welcome to BankSphere</h1>
+            <p class="lead mb-4">Experience the future of banking with AI-powered features, cryptocurrency support, and advanced security</p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-light btn-lg w-100" onclick="showLogin()">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button class="btn btn-outline-light btn-lg w-100" onclick="showRegister()">
+                                <i class="bi bi-person-plus"></i> Register
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Core Banking + Advanced Features</h2>
+            <div class="row">
+                <!-- Core Banking Features -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-bank text-primary" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">Complete Banking</h5>
+                            <p class="card-text">Full-featured banking with accounts, transfers, loans, and transaction management</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-lock text-primary" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">Enterprise Security</h5>
+                            <p class="card-text">Advanced security with role-based access, audit logging, and data protection</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-gear text-primary" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">Admin Dashboard</h5>
+                            <p class="card-text">Comprehensive admin panel for customer, account, and loan management</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced Features -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card feature-card h-100 border-warning">
+                        <div class="card-body text-center">
+                            <i class="bi bi-currency-bitcoin text-warning" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">🚀 Cryptocurrency Trading</h5>
+                            <p class="card-text">Buy, sell, and manage Bitcoin, Ethereum, and other digital assets</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card feature-card h-100 border-danger">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check text-danger" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">🚀 AI Fraud Detection</h5>
+                            <p class="card-text">Real-time AI-powered fraud detection and prevention system</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card feature-card h-100 border-info">
+                        <div class="card-body text-center">
+                            <i class="bi bi-robot text-info" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">🚀 AI Banking Assistant</h5>
+                            <p class="card-text">24/7 intelligent chatbot for customer service and financial guidance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2>About SecureBank</h2>
+                    <p class="lead">SecureBank is a next-generation banking platform that combines traditional banking services with cutting-edge technology.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle text-success"></i> Advanced Security Features</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Cryptocurrency Integration</li>
+                        <li><i class="bi bi-check-circle text-success"></i> AI-Powered Services</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Real-time Fraud Detection</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Smart Financial Management</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <i class="bi bi-bank text-primary" style="font-size: 10rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login to SecureBank</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="loginUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                    
+                    <div class="text-center my-3">
+                        <div class="d-flex align-items-center">
+                            <hr class="flex-grow-1">
+                            <span class="px-3 text-muted">OR</span>
+                            <hr class="flex-grow-1">
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline-primary w-100" onclick="loginWithBiometric()" id="biometricLoginBtn">
+                        <i class="bi bi-fingerprint"></i> Login with Fingerprint
+                    </button>
+                    
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">
+                            Demo Credentials:<br>
+                            Admin: admin / admin123<br>
+                            Customer: john_doe / password123
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register for SecureBank</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="regUsername" class="form-label">Username *</label>
+                            <input type="text" class="form-control" id="regUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="regEmail" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="regEmail" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="regFirstName" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="regFirstName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="regLastName" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="regLastName" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="regPassword" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="regPassword" required minlength="6">
+                            <div class="form-text">Minimum 6 characters</div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Other details will be auto-generated. You can update them later in your profile.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mb-2">Create Account</button>
+                        
+                        <div class="text-center my-2">
+                            <div class="d-flex align-items-center">
+                                <hr class="flex-grow-1">
+                                <span class="px-3 text-muted">OR</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-success w-100" onclick="quickRegister()">
+                            <i class="bi bi-lightning-fill"></i> Quick Register (Random Account)
+                        </button>
+                        <small class="text-muted d-block text-center mt-2">
+                            Creates a random account instantly - perfect for testing!
+                        </small>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 SecureBank. All rights reserved.</p>
+            <p>Experience the future of banking with enhanced security and AI-powered features.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/webauthn-biometric.js"></script>
+    
+    <script>
+        function showLogin() {
+            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
+        }
+
+        function showRegister() {
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            registerModal.show();
+        }
+
+        // Biometric login function
+        async function loginWithBiometric() {
+            const username = document.getElementById('loginUsername').value;
+            
+            if (!username) {
+                alert('Please enter your username first');
+                return;
+            }
+            
+            if (!biometricAuth.isSupported) {
+                alert('Biometric authentication is not supported on this device. Please use Windows Hello or a device with fingerprint sensor.');
+                return;
+            }
+            
+            try {
+                // Show biometric prompt
+                await biometricAuth.showBiometricPrompt('Touch your fingerprint sensor to login');
+                
+                // Authenticate with biometric
+                const result = await biometricAuth.authenticateBiometric(username);
+                
+                if (result.success) {
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+                    
+                    // Redirect based on role
+                    if (result.user.role === 'admin' || result.user.role === 'employee') {
+                        window.location.href = '/admin-dashboard.html';
+                    } else {
+                        window.location.href = '/enhanced-dashboard.html';
+                    }
+                } else {
+                    alert('Biometric authentication failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Biometric login error:', error);
+                
+                // Check if user has biometric registered
+                const hasRegistered = await biometricAuth.hasBiometricRegistered(username);
+                
+                if (!hasRegistered) {
+                    alert('❌ No fingerprint registered for this account.\n\n' +
+                          '📝 To use fingerprint login:\n' +
+                          '1. Login with your password first\n' +
+                          '2. Go to http://localhost:3000/add_biometric_for_user.html\n' +
+                          '3. Register your fingerprint\n' +
+                          '4. Then you can use fingerprint login!\n\n' +
+                          'For now, please login with your password.');
+                } else {
+                    alert('❌ Biometric login failed.\n\n' +
+                          'Possible reasons:\n' +
+                          '• Fingerprint sensor not detected\n' +
+                          '• Windows Hello not set up\n' +
+                          '• Browser doesn\'t support WebAuthn\n\n' +
+                          'Please use password login instead.');
+                }
+            }
+        }
+        
+        // Check biometric support on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('Checking biometric support...');
+            console.log('WebAuthn supported:', biometricAuth.isSupported);
+            
+            // Check if platform authenticator is available
+            if (window.PublicKeyCredential && window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+                try {
+                    const available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                    console.log('Platform authenticator available:', available);
+                    
+                    if (!available) {
+                        // Hide biometric features if no authenticator
+                        const biometricBtn = document.getElementById('biometricLoginBtn');
+                        if (biometricBtn) {
+                            biometricBtn.style.display = 'none';
+                        }
+                        
+                        // Hide the OR divider too
+                        const orDivider = biometricBtn?.previousElementSibling;
+                        if (orDivider && orDivider.classList.contains('text-center')) {
+                            orDivider.style.display = 'none';
+                        }
+                        
+                        const regBiometricDiv = document.getElementById('regBiometric')?.closest('.mb-3');
+                        if (regBiometricDiv) {
+                            regBiometricDiv.style.display = 'none';
+                        }
+                        
+                        console.log('ℹ️ Biometric authentication not available - features hidden');
+                    } else {
+                        console.log('✅ Biometric authentication ready!');
+                    }
+                } catch (error) {
+                    console.error('Error checking platform authenticator:', error);
+                }
+            }
+        });
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
+                    // Redirect based on role
+                    if (result.user.role === 'admin' || result.user.role === 'employee') {
+                        window.location.href = '/admin-dashboard.html';
+                    } else {
+                        window.location.href = '/enhanced-dashboard.html';
+                    }
+                } else {
+                    alert('Login failed: ' + result.message);
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+            }
+        });
+
+        // Handle register form submission
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Auto-generate missing fields
+            const randomPhone = `(${Math.floor(Math.random() * 900 + 100)}) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`;
+            const randomSSN = `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`;
+            const randomDate = `${Math.floor(Math.random() * 30 + 1970)}-${String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0')}-${String(Math.floor(Math.random() * 28 + 1)).padStart(2, '0')}`;
+            
+            const formData = {
+                username: document.getElementById('regUsername').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                firstName: document.getElementById('regFirstName').value,
+                lastName: document.getElementById('regLastName').value,
+                dateOfBirth: randomDate,
+                phone: randomPhone,
+                address: '123 Main St',
+                city: 'New York',
+                state: 'NY',
+                zipCode: '10001',
+                ssn: randomSSN
+            };
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Close registration modal
+                    bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+                    
+                    // Show success and redirect to login
+                    alert(`✅ Account created successfully!\n\n💰 Starting balance: $8,000\n\nPlease login with your credentials.`);
+                    showLogin();
+                    
+                    // Skip biometric for now
+                    if (false && biometricAuth.isSupported) {
+                        // Check if platform authenticator is actually available
+                        try {
+                            const available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                            if (!available) {
+                                alert('✅ Account created successfully!\n\n⚠️ Fingerprint registration skipped:\nWindows Hello is not set up on your device.\n\n💡 To enable fingerprint login:\n1. Go to Windows Settings (Win + I)\n2. Accounts → Sign-in options\n3. Set up Fingerprint recognition\n4. Then register fingerprint from your dashboard\n\n💰 Starting balance: $8,000\n\nPlease login with your password.');
+                                showLogin();
+                                return;
+                            }
+                        } catch (e) {
+                            console.error('Platform authenticator check failed:', e);
+                            alert('✅ Account created successfully!\n\n⚠️ Fingerprint registration skipped:\nCouldn\'t detect biometric hardware.\n\n💰 Starting balance: $8,000\n\nPlease login with your password.');
+                            showLogin();
+                            return;
+                        }
+                        
+                        // Show a loading message
+                        const loadingDiv = document.createElement('div');
+                        loadingDiv.className = 'position-fixed top-50 start-50 translate-middle bg-white p-4 rounded shadow';
+                        loadingDiv.style.zIndex = '9999';
+                        loadingDiv.innerHTML = `
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-3" role="status"></div>
+                                <h5>Setting up your account...</h5>
+                                <p class="text-muted">Please wait</p>
+                            </div>
+                        `;
+                        document.body.appendChild(loadingDiv);
+                        
+                        try {
+                            // Wait a moment for modal to close
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            
+                            // Login first to get token
+                            const loginResponse = await fetch('/api/auth/login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    username: formData.username,
+                                    password: formData.password
+                                })
+                            });
+                            
+                            const loginResult = await loginResponse.json();
+                            
+                            if (loginResult.success) {
+                                localStorage.setItem('token', loginResult.token);
+                                localStorage.setItem('user', JSON.stringify(loginResult.user));
+                                
+                                // Remove loading
+                                loadingDiv.remove();
+                                
+                                // Show biometric prompt
+                                await biometricAuth.showBiometricPrompt('Touch your fingerprint sensor to complete registration');
+                                
+                                // Register biometric
+                                const bioResult = await biometricAuth.registerBiometric(formData.username);
+                                
+                                if (bioResult.success) {
+                                    alert('🎉 Success!\n\n✅ Account created\n🔐 Fingerprint registered\n💰 Starting balance: $8,000\n\nYou can now login using your fingerprint!');
+                                    showLogin();
+                                } else {
+                                    alert('✅ Account created successfully!\n\n⚠️ Fingerprint registration failed: ' + (bioResult.message || 'Unknown error') + '\n\nYou can register your fingerprint later from the dashboard.\n\n💰 Starting balance: $8,000\n\nFor now, please login with your password.');
+                                    showLogin();
+                                }
+                            } else {
+                                loadingDiv.remove();
+                                alert('✅ Account created!\n\n⚠️ Auto-login failed. Please login manually with your credentials.');
+                                showLogin();
+                            }
+                        } catch (bioError) {
+                            console.error('Biometric registration error:', bioError);
+                            loadingDiv.remove();
+                            alert('✅ Account created successfully!\n\n⚠️ Fingerprint registration failed: ' + bioError.message + '\n\nYou can register your fingerprint later from the dashboard.\n\nPlease login with your password.');
+                            showLogin();
+                        }
+                    } else {
+                        if (registerBiometric && !biometricAuth.isSupported) {
+                            alert('✅ Account created successfully!\n\n⚠️ Biometric authentication is not supported on this device.\n\n💰 Starting balance: $8,000\n\nPlease login with your password.');
+                        } else {
+                            alert('✅ Account created successfully!\n\n💰 Starting balance: $8,000\n\nPlease login with your credentials.');
+                        }
+                        showLogin();
+                    }
+                } else {
+                    let errorMsg = 'Registration failed: ' + result.message;
+                    if (result.errors && result.errors.length > 0) {
+                        errorMsg += '\n\nValidation Errors:\n';
+                        result.errors.forEach(err => {
+                            errorMsg += `- ${err.path}: ${err.msg}\n`;
+                        });
+                    }
+                    
+                    // Add helpful hints for common errors
+                    if (result.message && result.message.includes('already exists')) {
+                        errorMsg += '\n\n💡 Tip: Try a different username, email, or SSN';
+                    }
+                    
+                    alert(errorMsg);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration error: ' + error.message + '\n\nPlease check the console for more details.');
+            }
+        });
+
+        // Auto-format phone number as user types
+        document.getElementById('regPhone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.substring(0, 10);
+            
+            if (value.length >= 6) {
+                e.target.value = `(${value.substring(0,3)}) ${value.substring(3,6)}-${value.substring(6)}`;
+            } else if (value.length >= 3) {
+                e.target.value = `(${value.substring(0,3)}) ${value.substring(3)}`;
+            } else if (value.length > 0) {
+                e.target.value = value;
+            }
+        });
+
+        // Auto-format SSN as user types
+        document.getElementById('regSSN').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 9) value = value.substring(0, 9);
+            
+            if (value.length >= 5) {
+                e.target.value = `${value.substring(0,3)}-${value.substring(3,5)}-${value.substring(5)}`;
+            } else if (value.length >= 3) {
+                e.target.value = `${value.substring(0,3)}-${value.substring(3)}`;
+            } else {
+                e.target.value = value;
+            }
+        });
+
+        // Auto-uppercase state
+        document.getElementById('regState').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase().substring(0, 2);
+        });
+
+        // Generate random SSN
+        function generateRandomSSN() {
+            const part1 = Math.floor(Math.random() * 900 + 100); // 100-999
+            const part2 = Math.floor(Math.random() * 90 + 10);   // 10-99
+            const part3 = Math.floor(Math.random() * 9000 + 1000); // 1000-9999
+            document.getElementById('regSSN').value = `${part1}-${part2}-${part3}`;
+        }
+        
+        // Quick Register - Create random account instantly
+        async function quickRegister() {
+            const randomNum = Math.floor(Math.random() * 10000);
+            const randomUsername = 'user' + randomNum;
+            const randomPassword = 'password123'; // Same password for all quick accounts
+            
+            const randomPhone = `(${Math.floor(Math.random() * 900 + 100)}) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`;
+            const randomSSN = `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`;
+            const randomDate = `${Math.floor(Math.random() * 30 + 1970)}-${String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0')}-${String(Math.floor(Math.random() * 28 + 1)).padStart(2, '0')}`;
+            
+            const formData = {
+                username: randomUsername,
+                email: randomUsername + '@test.com',
+                password: randomPassword,
+                firstName: 'User',
+                lastName: randomNum.toString(),
+                dateOfBirth: randomDate,
+                phone: randomPhone,
+                address: '123 Main St',
+                city: 'New York',
+                state: 'NY',
+                zipCode: '10001',
+                ssn: randomSSN
+            };
+            
+            try {
+                // Show loading
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+                
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+                    
+                    // Auto-login first
+                    const loginResponse = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: randomUsername, password: randomPassword })
+                    });
+                    
+                    const loginResult = await loginResponse.json();
+                    
+                    if (loginResult.success) {
+                        localStorage.setItem('token', loginResult.token);
+                        localStorage.setItem('user', JSON.stringify(loginResult.user));
+                        localStorage.setItem('quickRegPassword', randomPassword); // Save password for transfers
+                        
+                        // Ask about fingerprint registration
+                        if (biometricAuth.isSupported) {
+                            try {
+                                const available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                                
+                                if (available) {
+                                    const setupFingerprint = confirm(`✅ Account Created!\n\n👤 Username: ${randomUsername}\n🔑 Password: password123\n💰 Starting Balance: $8,000\n\n🔐 Would you like to set up fingerprint login now?\n\nClick OK to register fingerprint, or Cancel to skip.`);
+                                    
+                                    if (setupFingerprint) {
+                                        try {
+                                            await biometricAuth.showBiometricPrompt('Touch your fingerprint sensor to register');
+                                            const bioResult = await biometricAuth.registerBiometric(randomUsername);
+                                            
+                                            if (bioResult.success) {
+                                                alert('🎉 Perfect! Fingerprint registered successfully!\n\nYou can now login using your fingerprint.');
+                                            } else {
+                                                alert('⚠️ Fingerprint registration failed. You can try again later from Settings.');
+                                            }
+                                        } catch (bioError) {
+                                            console.error('Biometric error:', bioError);
+                                            alert('⚠️ Fingerprint registration failed. You can try again later from Settings.');
+                                        }
+                                    }
+                                } else {
+                                    alert(`✅ Account Created!\n\n👤 Username: ${randomUsername}\n🔑 Password: password123\n💰 Starting Balance: $8,000\n\nℹ️ Fingerprint login requires Windows Hello to be set up first.`);
+                                }
+                            } catch (e) {
+                                alert(`✅ Account Created!\n\n👤 Username: ${randomUsername}\n🔑 Password: password123\n💰 Starting Balance: $8,000`);
+                            }
+                        } else {
+                            alert(`✅ Account Created!\n\n👤 Username: ${randomUsername}\n🔑 Password: password123\n💰 Starting Balance: $8,000`);
+                        }
+                        
+                        // Redirect to dashboard
+                        window.location.href = '/enhanced-dashboard.html';
+                    } else {
+                        alert(`✅ Account Created!\n\n👤 Username: ${randomUsername}\n🔑 Password: password123\n💰 Starting Balance: $8,000\n\nPlease login manually.`);
+                        showLogin();
+                    }
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    alert('❌ Registration failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Quick register error:', error);
+                alert('❌ Registration error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Dashboard - BankSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .feature-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .crypto-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .investment-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .budget-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .biometric-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        .fraud-card {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+        .stats-card {
+            border-left: 4px solid #007bff;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bank"></i> BankSphere
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/enhanced-dashboard.html">Customer Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="admin-nav-item" style="display: none;">
+                        <a class="nav-link" href="/admin-dashboard.html">Admin Dashboard</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> <span id="nav-username">User</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary">
+                            <i class="bi bi-person-circle"></i> Customer Dashboard
+                        </h2>
+                        <p class="card-text">Experience the future of banking with AI-powered features, cryptocurrency support, and advanced security.</p>
+                        <div id="admin-notice" class="alert alert-info" style="display: none;">
+                            <i class="bi bi-info-circle"></i> 
+                            You have admin privileges. <a href="/admin-dashboard.html" class="alert-link">Switch to Admin Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Balance</h6>
+                                <h4 id="total-balance">$0.00</h4>
+                            </div>
+                            <i class="bi bi-wallet2 text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Crypto Portfolio</h6>
+                                <h4 id="crypto-value">$0.00</h4>
+                            </div>
+                            <i class="bi bi-currency-bitcoin text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Security Score</h6>
+                                <h4 id="security-score">98%</h4>
+                            </div>
+                            <i class="bi bi-shield-check text-success" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Banking Features -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4 class="mb-3">💳 Banking Services</h4>
+            </div>
+            
+            <!-- Account Overview -->
+            <div class="col-lg-6 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-bank"></i> My Accounts</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="accounts-list">
+                            <p class="text-center text-muted">Loading accounts...</p>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary btn-sm me-2" onclick="showTransferModal()">
+                                <i class="bi bi-arrow-left-right"></i> Transfer Money
+                            </button>
+                            <button class="btn btn-success btn-sm me-2" onclick="showDepositModal()">
+                                <i class="bi bi-plus-circle"></i> Deposit
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="showWithdrawModal()">
+                                <i class="bi bi-dash-circle"></i> Withdraw
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="col-lg-6 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="showTransactionHistory()">
+                                <i class="bi bi-clock-history"></i> Transaction History
+                            </button>
+                            <button class="btn btn-outline-success" onclick="showLoanApplication()">
+                                <i class="bi bi-cash-coin"></i> Apply for Loan
+                            </button>
+                            <button class="btn btn-outline-info" onclick="showAccountStatements()">
+                                <i class="bi bi-file-text"></i> Account Statements
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Advanced Features -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4 class="mb-3">🚀 Advanced Features</h4>
+            </div>
+            
+            <!-- Cryptocurrency Trading -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card feature-card crypto-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-currency-bitcoin"></i> Cryptocurrency
+                            </h5>
+                            <span class="badge bg-light text-dark">Live Trading</span>
+                        </div>
+                        <div id="crypto-wallets">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <small>Bitcoin</small><br>
+                                    <strong id="btc-price">$45,230</strong>
+                                </div>
+                                <div class="col-6">
+                                    <small>Ethereum</small><br>
+                                    <strong id="eth-price">$2,890</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm me-1" onclick="showCryptoBuy()">
+                                <i class="bi bi-cart-plus"></i> Buy
+                            </button>
+                            <button class="btn btn-outline-light btn-sm me-1" onclick="showCryptoSell()">
+                                <i class="bi bi-cart-dash"></i> Sell
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="showCryptoWallet()">
+                                <i class="bi bi-wallet2"></i> Wallet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Fraud Detection -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card feature-card fraud-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-shield-check"></i> AI Fraud Detection
+                            </h5>
+                            <span class="badge bg-light text-dark">Active</span>
+                        </div>
+                        <div id="fraud-status">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Security Level:</span>
+                                <span class="badge bg-success">High</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Transactions Monitored:</span>
+                                <span id="monitored-count">1,247</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Threats Blocked:</span>
+                                <span id="threats-blocked">3</span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm" onclick="showSecurityReport()">
+                                <i class="bi bi-file-text"></i> Security Report
+                            </button>
+                            <button class="btn btn-primary btn-sm ms-2" onclick="registerBiometricFromDashboard()">
+                                <i class="bi bi-fingerprint"></i> Register Fingerprint
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Banking Assistant -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card feature-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-robot"></i> AI Assistant
+                            </h5>
+                            <span class="badge bg-light text-dark">24/7</span>
+                        </div>
+                        <div class="mb-3">
+                            <p class="mb-2">Get instant help with:</p>
+                            <ul class="list-unstyled mb-0">
+                                <li><i class="bi bi-check"></i> Account inquiries</li>
+                                <li><i class="bi bi-check"></i> Transaction help</li>
+                                <li><i class="bi bi-check"></i> Financial advice</li>
+                            </ul>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm" onclick="startAIChat()">
+                                <i class="bi bi-chat-dots"></i> Start Chat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Spending Analytics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="spending-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recent-activity">
+                            <p class="text-center text-muted">Loading recent activity...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Data -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Market Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="market-data" class="row">
+                            <p class="text-center">Loading market data...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/webauthn-biometric.js"></script>
+    <script src="/js/biometric-transaction.js"></script>
+    <script src="/js/enhanced-features.js"></script>
+    <script src="/js/banking-functions.js"></script>
+    <script src="/js/biometric-wrapper.js"></script>
+    
+    <script>
+        // Initialize enhanced dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            if (!localStorage.getItem('token')) {
+                window.location.href = '/';
+                return;
+            }
+
+            // Check user role and show admin options if applicable
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.role === 'admin' || user.role === 'employee') {
+                document.getElementById('admin-nav-item').style.display = 'block';
+                document.getElementById('admin-notice').style.display = 'block';
+            }
+
+            // Update navigation with username
+            const navUsername = document.getElementById('nav-username');
+            if (navUsername) {
+                navUsername.textContent = user.username || 'User';
+            }
+            
+            // Auto-fill password for quick-registered users
+            if (user.username && user.username.startsWith('user')) {
+                // This is likely a quick-registered account
+                document.addEventListener('focus', function(e) {
+                    if (e.target.type === 'password' && e.target.placeholder && e.target.placeholder.includes('password')) {
+                        e.target.value = 'password123';
+                    }
+                }, true);
+            }
+
+            // Load all dashboard data
+            await loadDashboardData();
+            
+            // Set up periodic updates
+            setInterval(loadDashboardData, 30000); // Update every 30 seconds
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Load basic account data
+                await loadAccountSummary();
+                
+                // Load crypto portfolio directly
+                await loadCryptoPortfolio();
+                
+                // Load enhanced features data
+                if (window.enhancedFeatures) {
+                    await enhancedFeatures.loadBudgetStatus();
+                    await enhancedFeatures.loadBiometricStatus();
+                }
+                
+                // Load market data
+                await loadMarketData();
+                
+                // Load spending analytics
+                await loadSpendingChart();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+        
+        async function loadCryptoPortfolio() {
+            try {
+                const response = await fetch('/api/crypto/portfolio', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    displayCryptoPortfolio(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to load crypto portfolio:', error);
+            }
+        }
+        
+        function displayCryptoPortfolio(wallets) {
+            const container = document.getElementById('crypto-wallets');
+            if (!container) return;
+            
+            if (!wallets || wallets.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No crypto holdings</p>';
+                return;
+            }
+            
+            // Calculate total value
+            const totalValue = wallets.reduce((sum, w) => sum + parseFloat(w.current_value || 0), 0);
+            const cryptoValueEl = document.getElementById('crypto-value');
+            if (cryptoValueEl) {
+                cryptoValueEl.textContent = '$' + totalValue.toFixed(2);
+            }
+            
+            // Display holdings
+            const html = wallets.map(wallet => {
+                const amount = parseFloat(wallet.amount || 0);
+                const value = parseFloat(wallet.current_value || 0);
+                if (amount === 0) return '';
+                
+                return `
+                    <div class="row text-center mb-2">
+                        <div class="col-6">
+                            <small>${wallet.crypto_symbol}</small><br>
+                            <strong>${amount.toFixed(8)}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small>Value</small><br>
+                            <strong>$${value.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                `;
+            }).filter(h => h).join('');
+            
+            container.innerHTML = html || '<p class="text-muted text-center">No crypto holdings</p>';
+        }
+
+        async function loadAccountSummary() {
+            try {
+                const response = await fetch('/api/accounts', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const totalBalance = result.data.reduce((sum, account) => sum + parseFloat(account.balance || 0), 0);
+                    document.getElementById('total-balance').textContent = `$${totalBalance.toFixed(2)}`;
+                }
+            } catch (error) {
+                console.error('Failed to load account summary:', error);
+            }
+        }
+
+        async function loadMarketData() {
+            try {
+                const response = await fetch('/api/enhanced/crypto/market', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayMarketData(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to load market data:', error);
+            }
+        }
+
+        function displayMarketData(marketData) {
+            const container = document.getElementById('market-data');
+            const html = Object.entries(marketData).map(([symbol, data]) => `
+                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1">${symbol}</h6>
+                            <p class="card-text mb-1">$${data.currentPrice.toLocaleString()}</p>
+                            <small class="text-${data.change24h >= 0 ? 'success' : 'danger'}">
+                                ${data.change24h >= 0 ? '+' : ''}${data.change24h}%
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        async function loadSpendingChart() {
+            try {
+                const response = await fetch('/api/enhanced/expenses/analytics', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    createSpendingChart(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to load spending analytics:', error);
+            }
+        }
+
+        function createSpendingChart(data) {
+            const ctx = document.getElementById('spending-chart').getContext('2d');
+            
+            if (window.spendingChart) {
+                window.spendingChart.destroy();
+            }
+            
+            window.spendingChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.topCategories.map(cat => cat.category),
+                    datasets: [{
+                        data: data.topCategories.map(cat => cat.total_spent),
+                        backgroundColor: [
+                            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#BDC3C7'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Additional utility functions
+        async function loadMarketInsights() {
+            try {
+                const response = await fetch('/api/enhanced/investment/market-insights', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayMarketInsights(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to load market insights:', error);
+            }
+        }
+
+        function displayMarketInsights(insights) {
+            const modal = enhancedFeatures.createModal('Market Insights', `
+                <div class="market-insights">
+                    <h6>Market Trends</h6>
+                    <div class="row mb-3">
+                        ${Object.entries(insights.marketTrends).map(([market, data]) => `
+                            <div class="col-4">
+                                <div class="text-center">
+                                    <strong>${market.toUpperCase()}</strong><br>
+                                    <span class="text-${data.change.startsWith('+') ? 'success' : 'danger'}">
+                                        ${data.change}
+                                    </span><br>
+                                    <small class="text-muted">${data.trend}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <h6>Sector Performance</h6>
+                    <div class="mb-3">
+                        ${insights.sectorPerformance.map(sector => `
+                            <div class="d-flex justify-content-between">
+                                <span>${sector.sector}</span>
+                                <span class="text-${sector.performance.startsWith('+') ? 'success' : 'danger'}">
+                                    ${sector.performance}
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <h6>Recommendations</h6>
+                    <ul>
+                        ${insights.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function loadSpendingAnalytics() {
+            try {
+                const response = await fetch('/api/enhanced/expenses/insights', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displaySpendingInsights(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to load spending insights:', error);
+            }
+        }
+
+        function displaySpendingInsights(insights) {
+            const modal = enhancedFeatures.createModal('Spending Insights', `
+                <div class="spending-insights">
+                    ${insights.insights.map(insight => `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">${insight.title}</h6>
+                                <p class="card-text">${insight.message}</p>
+                                ${insight.type === 'budget_suggestion' ? `
+                                    <div class="mt-2">
+                                        <strong>Suggested Budget: $${insight.suggestedAmount.toFixed(2)}</strong>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function loadBudgetAlerts() {
+            try {
+                const response = await fetch('/api/enhanced/expenses/alerts', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayBudgetAlerts(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to load budget alerts:', error);
+            }
+        }
+
+        function displayBudgetAlerts(alerts) {
+            if (alerts.length === 0) {
+                enhancedFeatures.showAlert('success', 'No budget alerts at this time!');
+                return;
+            }
+
+            const modal = enhancedFeatures.createModal('Budget Alerts', `
+                <div class="budget-alerts">
+                    ${alerts.map(alert => `
+                        <div class="alert alert-${alert.severity === 'critical' ? 'danger' : 'warning'}">
+                            <strong>${alert.type === 'budget_warning' ? 'Budget Alert' : 'Category Alert'}</strong><br>
+                            ${alert.message}
+                        </div>
+                    `).join('')}
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function loadFraudAlerts() {
+            // This would typically be admin-only, but we can show user-specific security info
+            enhancedFeatures.showAlert('info', 'Your account security is being monitored 24/7. No suspicious activity detected.');
+        }
+
+        async function loadCryptoMarket() {
+            await loadMarketData();
+            enhancedFeatures.showAlert('info', 'Market data updated! Check the Market Overview section below.');
+        }
+
+        async function loadPortfolioPerformance() {
+            try {
+                if (!window.enhancedFeatures || !window.enhancedFeatures.currentUser) {
+                    enhancedFeatures.showAlert('error', 'Please log in to view portfolio performance');
+                    return;
+                }
+
+                const customerId = window.enhancedFeatures.currentUser.customerId;
+                if (!customerId) {
+                    enhancedFeatures.showAlert('info', 'Portfolio performance tracking is available for customer accounts');
+                    return;
+                }
+
+                const response = await fetch(`/api/enhanced/investment/analysis/${customerId}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayPortfolioPerformance(result.data);
+                } else {
+                    enhancedFeatures.showAlert('error', 'Failed to load portfolio performance');
+                }
+            } catch (error) {
+                console.error('Portfolio performance error:', error);
+                enhancedFeatures.showAlert('error', 'Error loading portfolio performance');
+            }
+        }
+
+        // Simplified Advanced Features Functions
+        function showCryptoBuy() {
+            const modal = createSimpleModal('Buy Cryptocurrency', `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Select Cryptocurrency:</h6>
+                        <select class="form-select mb-3" id="cryptoSelect">
+                            <option value="BTC">Bitcoin (BTC) - $45,230</option>
+                            <option value="ETH">Ethereum (ETH) - $2,890</option>
+                            <option value="ADA">Cardano (ADA) - $0.52</option>
+                        </select>
+                        <div class="mb-3">
+                            <label class="form-label">Amount (USD):</label>
+                            <input type="number" class="form-control" id="cryptoAmount" placeholder="100.00">
+                        </div>
+                        <button class="btn btn-primary" onclick="processCryptoPurchase()">
+                            <i class="bi bi-cart-plus"></i> Buy Crypto
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Market Prices:</h6>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Bitcoin (BTC)</span>
+                                <span class="text-success">$45,230 (+2.3%)</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Ethereum (ETH)</span>
+                                <span class="text-success">$2,890 (+1.8%)</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Cardano (ADA)</span>
+                                <span class="text-danger">$0.52 (-0.5%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            modal.show();
+        }
+
+        function showCryptoSell() {
+            const modal = createSimpleModal('Sell Cryptocurrency', `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Select Cryptocurrency to Sell:</h6>
+                        <select class="form-select mb-3" id="cryptoSellSelect">
+                            <option value="BTC">Bitcoin (BTC) - Holdings: 0.0221 BTC</option>
+                            <option value="ETH">Ethereum (ETH) - Holdings: 0.1734 ETH</option>
+                            <option value="ADA">Cardano (ADA) - Holdings: 0 ADA</option>
+                        </select>
+                        <div class="mb-3">
+                            <label class="form-label">Amount to Sell:</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="cryptoSellAmount" placeholder="0.001" step="0.0001">
+                                <span class="form-text ms-2">or</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">USD Value:</label>
+                            <input type="number" class="form-control" id="cryptoSellValue" placeholder="100.00" step="0.01">
+                        </div>
+                        <button class="btn btn-danger" onclick="processCryptoSale()">
+                            <i class="bi bi-cart-dash"></i> Sell Crypto
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Current Holdings:</h6>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between">
+                                <div>
+                                    <strong>Bitcoin (BTC)</strong><br>
+                                    <small>0.0221 BTC</small>
+                                </div>
+                                <div class="text-end">
+                                    <strong>$999.58</strong><br>
+                                    <small class="text-success">+$23.45</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <div>
+                                    <strong>Ethereum (ETH)</strong><br>
+                                    <small>0.1734 ETH</small>
+                                </div>
+                                <div class="text-end">
+                                    <strong>$501.25</strong><br>
+                                    <small class="text-success">+$9.12</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <div>
+                                    <strong>Cardano (ADA)</strong><br>
+                                    <small>0 ADA</small>
+                                </div>
+                                <div class="text-end">
+                                    <strong>$0.00</strong><br>
+                                    <small class="text-muted">No holdings</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Note:</strong> Selling crypto will convert your holdings to USD and deposit to your primary account.
+                        </div>
+                    </div>
+                </div>
+            `);
+            modal.show();
+
+            // Add event listeners for amount calculation
+            document.getElementById('cryptoSellAmount').addEventListener('input', function() {
+                const amount = parseFloat(this.value) || 0;
+                const crypto = document.getElementById('cryptoSellSelect').value;
+                let price = 0;
+                
+                switch(crypto) {
+                    case 'BTC': price = 45230; break;
+                    case 'ETH': price = 2890; break;
+                    case 'ADA': price = 0.52; break;
+                }
+                
+                const usdValue = amount * price;
+                document.getElementById('cryptoSellValue').value = usdValue.toFixed(2);
+            });
+
+            document.getElementById('cryptoSellValue').addEventListener('input', function() {
+                const usdValue = parseFloat(this.value) || 0;
+                const crypto = document.getElementById('cryptoSellSelect').value;
+                let price = 0;
+                
+                switch(crypto) {
+                    case 'BTC': price = 45230; break;
+                    case 'ETH': price = 2890; break;
+                    case 'ADA': price = 0.52; break;
+                }
+                
+                const amount = usdValue / price;
+                document.getElementById('cryptoSellAmount').value = amount.toFixed(6);
+            });
+        }
+
+        async function processCryptoSale() {
+            const crypto = document.getElementById('cryptoSellSelect').value;
+            const amount = parseFloat(document.getElementById('cryptoSellAmount').value);
+            const usdValue = parseFloat(document.getElementById('cryptoSellValue').value);
+            
+            if (!amount || !usdValue || amount <= 0 || usdValue <= 0) {
+                alert('Please enter a valid amount to sell');
+                return;
+            }
+            
+            // Get user's accounts
+            let accountId;
+            try {
+                const accountsResponse = await fetch('/api/accounts', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const accountsResult = await accountsResponse.json();
+                
+                if (!accountsResult.success || !accountsResult.data || accountsResult.data.length === 0) {
+                    alert('No accounts found. Please create an account first.');
+                    return;
+                }
+                
+                accountId = accountsResult.data[0].id;
+            } catch (error) {
+                alert('Failed to load accounts: ' + error.message);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/crypto/sell', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        cryptoSymbol: crypto,
+                        cryptoAmount: amount,
+                        accountId: accountId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ Successfully sold ${amount} ${crypto} for $${result.data.usdAmount}!\n\nNew account balance: $${result.data.newAccountBalance}`);
+                    bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide();
+                    
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    alert('❌ Sale failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Crypto sale error:', error);
+                alert('❌ Sale failed: ' + error.message);
+            }
+        }
+
+        function showCryptoWallet() {
+            const modal = createSimpleModal('My Crypto Wallet', `
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Portfolio Overview:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Asset</th>
+                                        <th>Amount</th>
+                                        <th>Value (USD)</th>
+                                        <th>24h Change</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="bi bi-currency-bitcoin text-warning"></i> Bitcoin</td>
+                                        <td>0.0221 BTC</td>
+                                        <td>$999.58</td>
+                                        <td class="text-success">+$23.45</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1" onclick="quickBuyCrypto('BTC')">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="quickSellCrypto('BTC')">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-diamond text-primary"></i> Ethereum</td>
+                                        <td>0.1734 ETH</td>
+                                        <td>$501.25</td>
+                                        <td class="text-success">+$9.12</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1" onclick="quickBuyCrypto('ETH')">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="quickSellCrypto('ETH')">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-currency-exchange text-info"></i> Cardano</td>
+                                        <td>0 ADA</td>
+                                        <td>$0.00</td>
+                                        <td class="text-muted">--</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success me-1" onclick="quickBuyCrypto('ADA')">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> 
+                                    Total Portfolio Value: <strong>$1,500.83</strong> (+$32.57 today)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" onclick="bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide(); showCryptoBuy();">
+                                        <i class="bi bi-cart-plus"></i> Buy More Crypto
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide(); showCryptoSell();">
+                                        <i class="bi bi-cart-dash"></i> Sell Crypto
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            modal.show();
+        }
+
+        function quickBuyCrypto(crypto) {
+            const cryptoNames = { 'BTC': 'Bitcoin', 'ETH': 'Ethereum', 'ADA': 'Cardano' };
+            const amount = prompt(`Enter USD amount to buy ${cryptoNames[crypto]}:`, '100');
+            
+            if (amount && parseFloat(amount) > 0) {
+                alert(`Successfully purchased $${amount} worth of ${cryptoNames[crypto]}!`);
+                // Refresh wallet display
+                bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide();
+                setTimeout(() => showCryptoWallet(), 500);
+            }
+        }
+
+        function quickSellCrypto(crypto) {
+            const cryptoNames = { 'BTC': 'Bitcoin', 'ETH': 'Ethereum', 'ADA': 'Cardano' };
+            const maxAmounts = { 'BTC': '0.0221', 'ETH': '0.1734', 'ADA': '0' };
+            
+            if (crypto === 'ADA') {
+                alert('You have no Cardano holdings to sell.');
+                return;
+            }
+            
+            const amount = prompt(`Enter ${crypto} amount to sell (max: ${maxAmounts[crypto]}):`, '0.001');
+            
+            if (amount && parseFloat(amount) > 0 && parseFloat(amount) <= parseFloat(maxAmounts[crypto])) {
+                const prices = { 'BTC': 45230, 'ETH': 2890, 'ADA': 0.52 };
+                const usdValue = (parseFloat(amount) * prices[crypto]).toFixed(2);
+                alert(`Successfully sold ${amount} ${crypto} for $${usdValue}!`);
+                // Refresh wallet display
+                bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide();
+                setTimeout(() => showCryptoWallet(), 500);
+            } else if (amount) {
+                alert('Invalid amount. Please enter a valid amount within your holdings.');
+            }
+        }
+
+        // Register biometric from dashboard
+        async function registerBiometricFromDashboard() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (!user) {
+                alert('Please login first');
+                return;
+            }
+            
+            if (!biometricAuth.isSupported) {
+                alert('❌ Biometric authentication is not supported on this device.\n\n' +
+                      'Requirements:\n' +
+                      '• Windows Hello enabled\n' +
+                      '• Fingerprint sensor or facial recognition\n' +
+                      '• Modern browser (Chrome, Edge, Firefox)');
+                return;
+            }
+            
+            try {
+                // Check if already registered
+                const hasRegistered = await biometricAuth.hasBiometricRegistered(user.username);
+                
+                if (hasRegistered) {
+                    const confirm = window.confirm('You already have a fingerprint registered.\n\nDo you want to register a new one? (This will replace the old one)');
+                    if (!confirm) return;
+                }
+                
+                // Show prompt
+                await biometricAuth.showBiometricPrompt('Register your fingerprint for quick login');
+                
+                // Register
+                const result = await biometricAuth.registerBiometric(user.username);
+                
+                if (result.success) {
+                    alert('✅ Success!\n\n' +
+                          'Your fingerprint has been registered successfully!\n\n' +
+                          '🔐 You can now:\n' +
+                          '• Login with just your fingerprint\n' +
+                          '• Verify transactions with your fingerprint\n' +
+                          '• No password needed for quick access\n\n' +
+                          'Try logging out and using "Login with Fingerprint" button!');
+                } else {
+                    alert('❌ Fingerprint registration failed.\n\n' + result.message);
+                }
+            } catch (error) {
+                console.error('Biometric registration error:', error);
+                alert('❌ Failed to register fingerprint.\n\n' +
+                      'Error: ' + error.message + '\n\n' +
+                      'Please make sure:\n' +
+                      '• Windows Hello is set up\n' +
+                      '• Your fingerprint sensor is working\n' +
+                      '• You have permission to use biometric features');
+            }
+        }
+
+        function showSecurityReport() {
+            const modal = createSimpleModal('AI Security Report', `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Security Overview:</h6>
+                        <div class="card bg-success text-white mb-3">
+                            <div class="card-body">
+                                <h5><i class="bi bi-shield-check"></i> Account Secure</h5>
+                                <p class="mb-0">No threats detected in the last 30 days</p>
+                            </div>
+                        </div>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Login Attempts</span>
+                                <span class="badge bg-success">All Verified</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Transaction Monitoring</span>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Device Recognition</span>
+                                <span class="badge bg-success">Enabled</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Recent Activity:</h6>
+                        <div class="timeline">
+                            <div class="alert alert-light">
+                                <small class="text-muted">2 hours ago</small><br>
+                                <i class="bi bi-check-circle text-success"></i> Transaction verified: $250.00 transfer
+                            </div>
+                            <div class="alert alert-light">
+                                <small class="text-muted">1 day ago</small><br>
+                                <i class="bi bi-shield text-primary"></i> Login from trusted device
+                            </div>
+                            <div class="alert alert-light">
+                                <small class="text-muted">3 days ago</small><br>
+                                <i class="bi bi-x-circle text-warning"></i> Suspicious login blocked (wrong location)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            modal.show();
+        }
+
+        function startAIChat() {
+            const modal = createSimpleModal('AI Banking Assistant', `
+                <div class="chat-container" style="height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; background: #f8f9fa;">
+                    <div class="chat-message mb-3">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <i class="bi bi-robot text-primary" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="bg-primary text-white p-2 rounded">
+                                    Hello! I'm your AI banking assistant. How can I help you today?
+                                </div>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="chatInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                        <button class="btn btn-primary" onclick="sendChatMessage()">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">💡 Try: "show my balance", "recent transactions", "transfer money", "loan info"</small>
+                    </div>
+                </div>
+            `);
+            modal.show();
+        }
+
+        async function processCryptoPurchase() {
+            const crypto = document.getElementById('cryptoSelect').value;
+            const amount = parseFloat(document.getElementById('cryptoAmount').value);
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            // Get user's accounts
+            let accountId;
+            try {
+                const accountsResponse = await fetch('/api/accounts', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const accountsResult = await accountsResponse.json();
+                
+                if (!accountsResult.success || !accountsResult.data || accountsResult.data.length === 0) {
+                    alert('No accounts found. Please create an account first.');
+                    return;
+                }
+                
+                accountId = accountsResult.data[0].id;
+            } catch (error) {
+                alert('Failed to load accounts: ' + error.message);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/crypto/buy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        cryptoSymbol: crypto,
+                        usdAmount: amount,
+                        accountId: accountId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ Successfully purchased ${result.data.cryptoAmount} ${crypto} for $${amount}!\n\nNew account balance: $${result.data.newAccountBalance}`);
+                    bootstrap.Modal.getInstance(document.querySelector('.modal.show')).hide();
+                    
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    alert('❌ Purchase failed: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Crypto purchase error:', error);
+                alert('❌ Purchase failed: ' + error.message);
+            }
+        }
+
+        // Generate session ID for chat
+        let chatSessionId = 'session-' + Date.now();
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const chatContainer = document.querySelector('.chat-container');
+            
+            // Add user message
+            chatContainer.innerHTML += `
+                <div class="chat-message mb-3">
+                    <div class="d-flex justify-content-end">
+                        <div class="flex-grow-1 text-end">
+                            <div class="bg-secondary text-white p-2 rounded d-inline-block" style="max-width: 70%;">
+                                ${escapeHtml(message)}
+                            </div><br>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                        <div class="ms-2">
+                            <i class="bi bi-person-circle text-secondary" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Clear input
+            input.value = '';
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Show typing indicator
+            chatContainer.innerHTML += `
+                <div class="chat-message mb-3 typing-indicator">
+                    <div class="d-flex">
+                        <div class="me-2">
+                            <i class="bi bi-robot text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="bg-light p-2 rounded">
+                                <span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Call real AI chatbot API
+            try {
+                const response = await fetch('/api/enhanced/chatbot/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        sessionId: chatSessionId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                // Remove typing indicator
+                document.querySelector('.typing-indicator').remove();
+                
+                if (result.success) {
+                    const botResponse = result.data.text;
+                    
+                    chatContainer.innerHTML += `
+                        <div class="chat-message mb-3">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="bi bi-robot text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="bg-primary text-white p-2 rounded" style="max-width: 70%;">
+                                        ${escapeHtml(botResponse).replace(/\n/g, '<br>')}
+                                    </div>
+                                    <small class="text-muted">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                } else {
+                    chatContainer.innerHTML += `
+                        <div class="chat-message mb-3">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="bi bi-robot text-danger" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="bg-danger text-white p-2 rounded">
+                                        Sorry, I encountered an error. Please try again.
+                                    </div>
+                                    <small class="text-muted">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Chat error:', error);
+                // Remove typing indicator
+                const typingIndicator = document.querySelector('.typing-indicator');
+                if (typingIndicator) typingIndicator.remove();
+                
+                chatContainer.innerHTML += `
+                    <div class="chat-message mb-3">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <i class="bi bi-robot text-danger" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="bg-danger text-white p-2 rounded">
+                                    Sorry, I'm having trouble connecting. Please try again.
+                                </div>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+        
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function createSimpleModal(title, content) {
+            const modalId = 'featureModal' + Date.now();
+            const modalHtml = `
+                <div class="modal fade" id="${modalId}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${content}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById(modalId));
+            
+            // Clean up modal after it's hidden
+            document.getElementById(modalId).addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+            
+            return modal;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Forms - SecureBank</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .test-result { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Authentication Test Page</h1>
+        
+        <!-- Login Test -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Test Login</h3>
+            </div>
+            <div class="card-body">
+                <form id="testLoginForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="loginUsername" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" value="admin123">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Test Login</button>
+                </form>
+                <div id="loginResult"></div>
+            </div>
+        </div>
+
+        <!-- Registration Test -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Test Registration</h3>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-success mb-3" onclick="fillRandomData()">Fill with Random Data</button>
+                <form id="testRegisterForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="regUsername" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="regEmail" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="regFirstName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="regLastName" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password (min 8 chars, uppercase, lowercase, number, special char)</label>
+                        <input type="password" class="form-control" id="regPassword" value="Test123!@#" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="regDateOfBirth" value="1990-01-01" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone (XXX) XXX-XXXX</label>
+                            <input type="tel" class="form-control" id="regPhone" value="(555) 123-4567" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <input type="text" class="form-control" id="regAddress" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" id="regCity" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">State (2 letters)</label>
+                            <input type="text" class="form-control" id="regState" maxlength="2" value="NY" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" id="regZipCode" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">SSN (XXX-XX-XXXX)</label>
+                        <input type="text" class="form-control" id="regSSN" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Test Registration</button>
+                </form>
+                <div id="registerResult"></div>
+            </div>
+        </div>
+
+        <!-- Customer Login Test -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Test Customer Login</h3>
+            </div>
+            <div class="card-body">
+                <form id="testCustomerLoginForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="customerUsername" value="john_doe">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="customerPassword" value="password123">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Test Customer Login</button>
+                </form>
+                <div id="customerLoginResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function fillRandomData() {
+            const randomNum = Math.floor(Math.random() * 10000);
+            const ssnPart1 = Math.floor(Math.random() * 900 + 100);
+            const ssnPart2 = Math.floor(Math.random() * 90 + 10);
+            const ssnPart3 = Math.floor(Math.random() * 9000 + 1000);
+            
+            document.getElementById('regUsername').value = `testuser${randomNum}`;
+            document.getElementById('regEmail').value = `test${randomNum}@example.com`;
+            document.getElementById('regFirstName').value = 'Test';
+            document.getElementById('regLastName').value = 'User';
+            document.getElementById('regAddress').value = '123 Test Street';
+            document.getElementById('regCity').value = 'Test City';
+            document.getElementById('regZipCode').value = '12345';
+            document.getElementById('regSSN').value = `${ssnPart1}-${ssnPart2}-${ssnPart3}`;
+        }
+
+        // Test Login
+        document.getElementById('testLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '<div class="spinner-border" role="status"></div>';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('loginUsername').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            <h5>✅ Login Successful!</h5>
+                            <p><strong>User:</strong> ${result.user.username}</p>
+                            <p><strong>Role:</strong> ${result.user.role}</p>
+                            <p><strong>Token:</strong> ${result.token.substring(0, 50)}...</p>
+                        </div>
+                    `;
+                    localStorage.setItem('token', result.token);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="test-result error">
+                            <h5>❌ Login Failed</h5>
+                            <p>${result.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <h5>❌ Error</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Test Registration
+        document.getElementById('testRegisterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.innerHTML = '<div class="spinner-border" role="status"></div>';
+            
+            const formData = {
+                username: document.getElementById('regUsername').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                firstName: document.getElementById('regFirstName').value,
+                lastName: document.getElementById('regLastName').value,
+                dateOfBirth: document.getElementById('regDateOfBirth').value,
+                phone: document.getElementById('regPhone').value,
+                address: document.getElementById('regAddress').value,
+                city: document.getElementById('regCity').value,
+                state: document.getElementById('regState').value,
+                zipCode: document.getElementById('regZipCode').value,
+                ssn: document.getElementById('regSSN').value
+            };
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            <h5>✅ Registration Successful!</h5>
+                            <p><strong>Username:</strong> ${formData.username}</p>
+                            <p><strong>Email:</strong> ${formData.email}</p>
+                            <p>You can now login with these credentials.</p>
+                        </div>
+                    `;
+                } else {
+                    let errorDetails = result.message;
+                    if (result.errors) {
+                        errorDetails += '<br><br><strong>Validation Errors:</strong><ul>';
+                        result.errors.forEach(err => {
+                            errorDetails += `<li>${err.path}: ${err.msg}</li>`;
+                        });
+                        errorDetails += '</ul>';
+                    }
+                    resultDiv.innerHTML = `
+                        <div class="test-result error">
+                            <h5>❌ Registration Failed</h5>
+                            <p>${errorDetails}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <h5>❌ Error</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Test Customer Login
+        document.getElementById('testCustomerLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('customerLoginResult');
+            resultDiv.innerHTML = '<div class="spinner-border" role="status"></div>';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('customerUsername').value,
+                        password: document.getElementById('customerPassword').value
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            <h5>✅ Customer Login Successful!</h5>
+                            <p><strong>User:</strong> ${result.user.username}</p>
+                            <p><strong>Role:</strong> ${result.user.role}</p>
+                            <p><strong>Token:</strong> ${result.token.substring(0, 50)}...</p>
+                        </div>
+                    `;
+                    localStorage.setItem('token', result.token);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="test-result error">
+                            <h5>❌ Customer Login Failed</h5>
+                            <p>${result.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <h5>❌ Error</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Auto-fill random data on page load
+        window.addEventListener('load', () => {
+            fillRandomData();
+        });
+    </script>
+</body>
+</html>

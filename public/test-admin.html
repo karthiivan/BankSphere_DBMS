@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Test - BankSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Admin Functionality Test</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Admin Login Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-danger" onclick="testAdminLogin()">Test Admin Login</button>
+                        <div id="adminLoginResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Dashboard Stats Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-info" onclick="testDashboardStats()">Load Dashboard Stats</button>
+                        <div id="dashboardResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Customer Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-success" onclick="testCustomers()">Load Customers</button>
+                        <div id="customersResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Account Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" onclick="testAllAccounts()">Load All Accounts</button>
+                        <div id="accountsResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Loan Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-warning" onclick="testLoans()">Load Loans</button>
+                        <div id="loansResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>SQL Query Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="sqlQuery" class="form-control mb-2" rows="3" placeholder="SELECT * FROM users LIMIT 5"></textarea>
+                        <button class="btn btn-secondary" onclick="testSQLQuery()">Execute SQL</button>
+                        <div id="sqlResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Transaction Monitoring</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-info" onclick="testTransactionMonitoring()">Load Transactions</button>
+                        <div id="transactionResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let adminToken = '';
+
+        async function testAdminLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    adminToken = result.token;
+                    document.getElementById('adminLoginResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Admin login successful!</div>';
+                } else {
+                    document.getElementById('adminLoginResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Admin login failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('adminLoginResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testDashboardStats() {
+            if (!adminToken) {
+                alert('Please login as admin first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/dashboard', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const stats = result.data;
+                    document.getElementById('dashboardResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Dashboard stats loaded:<br>' +
+                        `<strong>Customers:</strong> ${stats.totalCustomers}<br>` +
+                        `<strong>Accounts:</strong> ${stats.totalAccounts}<br>` +
+                        `<strong>Balance:</strong> $${parseFloat(stats.totalBalance || 0).toFixed(2)}<br>` +
+                        `<strong>Today's Transactions:</strong> ${stats.todayTransactions}</div>`;
+                } else {
+                    document.getElementById('dashboardResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('dashboardResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testCustomers() {
+            if (!adminToken) {
+                alert('Please login as admin first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/customers', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const customers = result.data.slice(0, 3); // Show first 3
+                    const customerList = customers.map(c => 
+                        `<li>${c.first_name} ${c.last_name} (${c.email}) - ${c.is_active ? 'Active' : 'Inactive'}</li>`
+                    ).join('');
+                    document.getElementById('customersResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Customers loaded:<ul>' + customerList + '</ul></div>';
+                } else {
+                    document.getElementById('customersResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('customersResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testAllAccounts() {
+            if (!adminToken) {
+                alert('Please login as admin first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/accounts', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const accounts = result.data.slice(0, 3); // Show first 3
+                    const accountList = accounts.map(a => 
+                        `<li>${a.account_number} - ${a.first_name} ${a.last_name} - $${parseFloat(a.balance).toFixed(2)}</li>`
+                    ).join('');
+                    document.getElementById('accountsResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Accounts loaded:<ul>' + accountList + '</ul></div>';
+                } else {
+                    document.getElementById('accountsResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('accountsResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testLoans() {
+            if (!adminToken) {
+                alert('Please login as admin first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/loans', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const loans = result.data;
+                    if (loans.length > 0) {
+                        const loanList = loans.slice(0, 3).map(l => 
+                            `<li>${l.loan_number} - ${l.customer_name} - $${parseFloat(l.amount).toFixed(2)} (${l.status})</li>`
+                        ).join('');
+                        document.getElementById('loansResult').innerHTML = 
+                            '<div class="alert alert-success">✅ Loans loaded:<ul>' + loanList + '</ul></div>';
+                    } else {
+                        document.getElementById('loansResult').innerHTML = 
+                            '<div class="alert alert-info">ℹ️ No loans found in the system</div>';
+                    }
+                } else {
+                    document.getElementById('loansResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('loansResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testSQLQuery() {
+            if (!adminToken) {
+                alert('Please login as admin first');
+                return;
+            }
+            
+            const query = document.getElementById('sqlQuery').value.trim() || 'SELECT * FROM users LIMIT 5';
+            
+            try {
+                const response = await fetch('/api/admin/sql-query', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken}` 
+                    },
+                    body: JSON.stringify({ query })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const data = result.data;
+                    if (data.length > 0) {
+                        const headers = Object.keys(data[0]);
+                        const table = `
+                            <table class="table table-sm table-striped">
+                                <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                                <tbody>
+                                    ${data.slice(0, 5).map(row => 
+                                        `<tr>${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`
+                                    ).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                        document.getElementById('sqlResult').innerHTML = 
+                            '<div class="alert alert-success">✅ Query executed successfully:</div>' + table;
+                    } else {
+                        document.getElementById('sqlResult').innerHTML = 
+                            '<div class="alert alert-success">✅ Query executed successfully (no results)</div>';
+                    }
+                } else {
+                    document.getElementById('sqlResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Query failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('sqlResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testTransactionMonitoring() {
+            if (!adminToken) {
+                alert('Please login as admin first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/transactions/history?limit=10', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const transactions = result.data.slice(0, 3); // Show first 3
+                    const txList = transactions.map(tx => 
+                        `<li>${new Date(tx.created_at).toLocaleDateString()} - ${tx.transaction_type} - $${parseFloat(tx.amount).toFixed(2)}</li>`
+                    ).join('');
+                    document.getElementById('transactionResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Transactions loaded:<ul>' + txList + '</ul></div>';
+                } else {
+                    document.getElementById('transactionResult').innerHTML = 
+                        '<div class="alert alert-danger">❌ Failed: ' + result.message + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('transactionResult').innerHTML = 
+                    '<div class="alert alert-danger">❌ Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
