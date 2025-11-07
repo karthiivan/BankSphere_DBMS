@@ -107,6 +107,18 @@ const startServer = async () => {
             process.exit(1);
         }
 
+        // Auto-setup database on first run (for Render deployment)
+        if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+            console.log('🔄 Checking database setup...');
+            try {
+                const { setupDatabase } = require('./scripts/setup-database');
+                await setupDatabase();
+            } catch (error) {
+                console.log('⚠️  Database auto-setup skipped:', error.message);
+                console.log('   You may need to import the schema manually');
+            }
+        }
+
         app.listen(PORT, () => {
             console.log(`🚀 Bank Management System server running on port ${PORT}`);
             console.log(`📱 Frontend: http://localhost:${PORT}`);

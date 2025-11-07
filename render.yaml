@@ -9,10 +9,11 @@ services:
       - name: banksphere
         user: banksphere_user
 
-  # Web Service
+  # Web Service (Backend + Frontend)
   - type: web
-    name: banksphere
+    name: banksphere-app
     env: node
+    region: oregon
     plan: free
     buildCommand: npm install
     startCommand: npm start
