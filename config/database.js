@@ -66,15 +66,20 @@ async function executeQuery(query, params = []) {
         const converted = convertQueryToPostgres(query, params);
         let finalQuery = converted.query;
         
-        // Add RETURNING clause for INSERT statements
-        if (query.trim().toUpperCase().startsWith('INSERT')) {
+        // Add RETURNING clause for INSERT statements only if not already present
+        if (query.trim().toUpperCase().startsWith('INSERT') && !query.toUpperCase().includes('RETURNING')) {
             finalQuery = addReturningClause(finalQuery);
         }
         
         const result = await client.query(finalQuery, converted.params);
         
-        // For INSERT queries, return an object with insertId for MySQL compatibility
+        // For INSERT queries with RETURNING clause, return rows directly
         if (query.trim().toUpperCase().startsWith('INSERT') && result.rows && result.rows.length > 0) {
+            // If query already had RETURNING, just return rows array
+            if (query.toUpperCase().includes('RETURNING')) {
+                return result.rows;
+            }
+            // Otherwise return MySQL-compatible format
             return {
                 insertId: result.rows[0].id,
                 affectedRows: result.rowCount,
