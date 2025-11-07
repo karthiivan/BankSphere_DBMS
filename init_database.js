@@ -1,53 +1,41 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 async function initializeDatabase() {
-    let connection;
+    const pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    });
     
     try {
-        console.log('🔄 Connecting to MySQL server...');
+        console.log('🔄 Connecting to PostgreSQL server...');
         
-        // First connect without specifying database
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST || 'localhost',
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || ''
-        });
+        const client = await pool.connect();
+        console.log('✅ Connected to PostgreSQL server');
 
-        console.log('✅ Connected to MySQL server');
+        // PostgreSQL databases are created via Render dashboard
+        // We'll just run the schema file
 
-        // Create database if it doesn't exist
-        const dbName = process.env.DB_NAME || 'bank_management';
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
-        console.log(`✅ Database '${dbName}' created or already exists`);
-
-        // Close connection and reconnect with database specified
-        await connection.end();
+        console.log('🔄 Running PostgreSQL schema...');
         
-        connection = await mysql.createConnection({
-            host: process.env.DB_HOST || 'localhost',
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || '',
-            database: dbName
-        });
+        // Read and execute the PostgreSQL schema file
+        const schemaPath = path.join(__dirname, 'complete_database_schema_postgresql.sql');
+        
+        if (fs.existsSync(schemaPath)) {
+            const schema = fs.readFileSync(schemaPath, 'utf8');
+            await client.query(schema);
+            console.log('✅ PostgreSQL schema executed successfully');
+        } else {
+            console.log('⚠️  Schema file not found. Creating basic tables...');
+            
+            // Fallback: Create basic tables if schema file not found
+            await createBasicTables(client);
+        }
 
-        // Create basic tables
-        console.log('🔄 Creating basic tables...');
-
-        // Users table
-        await connection.execute(`
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                password_hash VARCHAR(255) NOT NULL,
-                role ENUM('customer', 'employee', 'admin') DEFAULT 'customer',
-                is_active BOOLEAN DEFAULT TRUE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )
-        `);
-
+        client.release();
+        await pool.end();
         // Customers table
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS customers (
@@ -243,7 +231,9 @@ async function initializeDatabase() {
             VALUES (1, 1, 2, 1, 'ACC001000001', 5000.00)
         `);
 
-        console.log('✅ Sample data inserted successfully');
+        client.release();
+        await pool.end();
+        
         console.log('');
         console.log('🎉 Database initialization completed!');
         console.log('');
@@ -254,12 +244,81 @@ async function initializeDatabase() {
 
     } catch (error) {
         console.error('❌ Database initialization failed:', error.message);
+        console.error(error);
         process.exit(1);
-    } finally {
-        if (connection) {
-            await connection.end();
-        }
     }
+}
+
+async function createBasicTables(client) {
+    console.log('Creating basic PostgreSQL tables...');
+    
+    // Create ENUM types
+    await client.query(`
+        DO $$ BEGIN
+            CREATE TYPE user_role AS ENUM ('customer', 'admin', 'manager');
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+    `);
+    
+    await client.query(`
+        DO $$ BEGIN
+            CREATE TYPE account_status AS ENUM ('active', 'inactive', 'frozen', 'closed');
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+    `);
+    
+    // Users table
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            role user_role DEFAULT 'customer',
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    
+    // Customers table
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS customers (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER UNIQUE NOT NULL,
+            first_name VARCHAR(50) NOT NULL,
+            last_name VARCHAR(50) NOT NULL,
+            date_of_birth DATE NOT NULL,
+            phone VARCHAR(20),
+            address TEXT,
+            city VARCHAR(50),
+            state VARCHAR(50),
+            zip_code VARCHAR(10),
+            ssn VARCHAR(20) UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    `);
+    
+    // Accounts table
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS accounts (
+            id SERIAL PRIMARY KEY,
+            customer_id INTEGER NOT NULL,
+            account_number VARCHAR(20) UNIQUE NOT NULL,
+            account_type VARCHAR(20) NOT NULL,
+            balance DECIMAL(15,2) DEFAULT 0.00,
+            status account_status DEFAULT 'active',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+        )
+    `);
+    
+    console.log('✅ Basic tables created');
 }
 
 // Run initialization

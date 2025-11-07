@@ -1,31 +1,27 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 require('dotenv').config();
+const { convertQueryToPostgres, addReturningClause, convertResult } = require('./queryHelper');
 
-// Database configuration
-const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'bank_management',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-};
-
-// Create connection pool
-const pool = mysql.createPool(dbConfig);
+// Database configuration for PostgreSQL
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+});
 
 // Test database connection
 async function testConnection() {
     try {
-        const connection = await pool.getConnection();
+        const client = await pool.connect();
         console.log('✅ Database connected successfully');
         
         // Test basic query
-        const [rows] = await connection.execute('SELECT 1 as test');
+        const result = await client.query('SELECT 1 as test');
         console.log('✅ Database query test passed');
         
-        connection.release();
+        client.release();
         return true;
     } catch (error) {
         console.error('❌ Database connection failed:', error.message);
@@ -33,24 +29,63 @@ async function testConnection() {
     }
 }
 
-// Get connection from pool
+// Get connection from pool (wrapper to maintain compatibility)
 async function getConnection() {
     try {
-        return await pool.getConnection();
+        const client = await pool.connect();
+        
+        // Add execute method for MySQL compatibility
+        if (!client.execute) {
+            client.execute = async function(query, params = []) {
+                const converted = convertQueryToPostgres(query, params);
+                let finalQuery = converted.query;
+                
+                // Add RETURNING clause for INSERT statements
+                if (query.trim().toUpperCase().startsWith('INSERT')) {
+                    finalQuery = addReturningClause(finalQuery);
+                }
+                
+                const result = await this.query(finalQuery, converted.params);
+                
+                // Return in MySQL-like format: [rows, fields]
+                return [result.rows, result.fields];
+            };
+        }
+        
+        return client;
     } catch (error) {
         console.error('❌ Failed to get database connection:', error);
         throw error;
     }
 }
 
-// Execute query with connection handling
+// Execute query with connection handling (auto-converts MySQL syntax to PostgreSQL)
 async function executeQuery(query, params = []) {
-    const connection = await getConnection();
+    const client = await getConnection();
     try {
-        const [results] = await connection.execute(query, params);
-        return results;
+        const converted = convertQueryToPostgres(query, params);
+        let finalQuery = converted.query;
+        
+        // Add RETURNING clause for INSERT statements
+        if (query.trim().toUpperCase().startsWith('INSERT')) {
+            finalQuery = addReturningClause(finalQuery);
+        }
+        
+        const result = await client.query(finalQuery, converted.params);
+        
+        // For INSERT queries, return an object with insertId for MySQL compatibility
+        if (query.trim().toUpperCase().startsWith('INSERT') && result.rows && result.rows.length > 0) {
+            return {
+                insertId: result.rows[0].id,
+                affectedRows: result.rowCount,
+                rows: result.rows
+            };
+        }
+        
+        // For other queries, return rows array
+        return result.rows;
     } finally {
-        connection.release();
+        client.release();
     }
 }
 
