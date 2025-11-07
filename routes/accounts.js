@@ -12,23 +12,22 @@ router.get('/', authenticateToken, async (req, res) => {
         if (req.user.role === 'customer') {
             // Customers can only see their own accounts
             query = `
-                SELECT a.*, at.name as account_type_name, at.description as account_type_description,
-                       b.name as branch_name
+                SELECT a.id, a.customer_id, a.account_number, a.account_type, 
+                       a.balance, a.currency, a.status, a.interest_rate, 
+                       a.overdraft_limit, a.created_at, a.updated_at
                 FROM accounts a
-                JOIN account_types at ON a.account_type_id = at.id
-                JOIN branches b ON a.branch_id = b.id
-                WHERE a.customer_id = ? AND a.status != 'closed'
+                WHERE a.customer_id = $1 AND a.status != 'closed'
                 ORDER BY a.created_at DESC
             `;
             params = [req.user.customerId];
         } else {
             // Employees and admins can see all accounts
             query = `
-                SELECT a.*, at.name as account_type_name, at.description as account_type_description,
-                       b.name as branch_name, c.first_name, c.last_name
+                SELECT a.id, a.customer_id, a.account_number, a.account_type,
+                       a.balance, a.currency, a.status, a.interest_rate,
+                       a.overdraft_limit, a.created_at, a.updated_at,
+                       c.first_name, c.last_name
                 FROM accounts a
-                JOIN account_types at ON a.account_type_id = at.id
-                JOIN branches b ON a.branch_id = b.id
                 JOIN customers c ON a.customer_id = c.id
                 WHERE a.status != 'closed'
                 ORDER BY a.created_at DESC
@@ -63,26 +62,24 @@ router.get('/:id', authenticateToken, async (req, res) => {
         if (req.user.role === 'customer') {
             // Customers can only see their own accounts
             query = `
-                SELECT a.*, at.name as account_type_name, at.description as account_type_description,
-                       b.name as branch_name, b.address as branch_address
+                SELECT a.id, a.customer_id, a.account_number, a.account_type,
+                       a.balance, a.currency, a.status, a.interest_rate,
+                       a.overdraft_limit, a.created_at, a.updated_at
                 FROM accounts a
-                JOIN account_types at ON a.account_type_id = at.id
-                JOIN branches b ON a.branch_id = b.id
-                WHERE a.id = ? AND a.customer_id = ?
+                WHERE a.id = $1 AND a.customer_id = $2
             `;
             params = [accountId, req.user.customerId];
         } else {
             // Employees and admins can see any account
             query = `
-                SELECT a.*, at.name as account_type_name, at.description as account_type_description,
-                       b.name as branch_name, b.address as branch_address,
+                SELECT a.id, a.customer_id, a.account_number, a.account_type,
+                       a.balance, a.currency, a.status, a.interest_rate,
+                       a.overdraft_limit, a.created_at, a.updated_at,
                        c.first_name, c.last_name, c.phone, u.email
                 FROM accounts a
-                JOIN account_types at ON a.account_type_id = at.id
-                JOIN branches b ON a.branch_id = b.id
                 JOIN customers c ON a.customer_id = c.id
                 JOIN users u ON c.user_id = u.id
-                WHERE a.id = ?
+                WHERE a.id = $1
             `;
             params = [accountId];
         }
@@ -190,7 +187,7 @@ router.patch('/:id/status', authenticateToken, requireRole(['employee', 'admin']
 
         // Update account status
         const result = await executeQuery(
-            'UPDATE accounts SET status = ?, updated_at = NOW() WHERE id = ?',
+            'UPDATE accounts SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
             [status, accountId]
         );
 
@@ -224,7 +221,7 @@ router.get('/:id/transactions', authenticateToken, async (req, res) => {
         // Check if user has access to this account
         if (req.user.role === 'customer') {
             const accountCheck = await executeQuery(
-                'SELECT id FROM accounts WHERE id = ? AND customer_id = ?',
+                'SELECT id FROM accounts WHERE id = $1 AND customer_id = $2',
                 [accountId, req.user.customerId]
             );
 
@@ -238,9 +235,9 @@ router.get('/:id/transactions', authenticateToken, async (req, res) => {
 
         const transactions = await executeQuery(
             `SELECT * FROM transactions 
-             WHERE account_id = ? 
+             WHERE account_id = $1 
              ORDER BY created_at DESC 
-             LIMIT ? OFFSET ?`,
+             LIMIT $2 OFFSET $3`,
             [accountId, parseInt(limit), parseInt(offset)]
         );
 
